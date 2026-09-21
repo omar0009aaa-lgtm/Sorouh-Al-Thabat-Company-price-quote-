@@ -1,0 +1,2076 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>صروح الثبات | نظام عروض الأسعار</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;900&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+  <style>
+    :root {
+      --navy: #0B1F4D;
+      --navy-2: #132a63;
+      --orange: #F97316;
+      --orange-2: #fb8c3c;
+      --bg: #F3F5F9;
+      --card: #ffffff;
+      --border: #E3E7EE;
+      --text: #1C2333;
+      --muted: #7A8296;
+      --green: #1E9E5A;
+      --red: #E0433A;
+      --bank-blue: #003366;
+      --whatsapp: #25D366;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: 'Tajawal', sans-serif; background: var(--bg); color: var(--text); }
+    a { color: inherit; text-decoration: none; }
+    button { font-family: inherit; cursor: pointer; border: none; }
+    input, select, textarea { font-family: inherit; }
+
+    #topbar { background: var(--navy); color: #fff; padding: 14px 22px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 50; box-shadow: 0 2px 10px rgba(0, 0, 0, .15); }
+    #topbar .brand { display: flex; align-items: center; gap: 10px; font-weight: 900; font-size: 18px; }
+    #topbar .brand .dot { width: 10px; height: 10px; background: var(--orange); border-radius: 3px; transform: rotate(45deg); }
+    #topbar nav { display: flex; gap: 6px; flex-wrap: wrap; }
+    #topbar nav button { background: transparent; color: #cdd6ea; padding: 8px 14px; border-radius: 8px; font-weight: 700; font-size: 14px; transition: .15s; }
+    #topbar nav button:hover { background: rgba(255, 255, 255, .08); color: #fff; }
+    #topbar nav button.active { background: var(--orange); color: #fff; }
+
+    #app { max-width: 1180px; margin: 0 auto; padding: 26px 18px 80px; }
+    .page-title { font-size: 24px; font-weight: 900; color: var(--navy); margin: 0 0 4px; }
+    .page-sub { color: var(--muted); font-size: 14px; margin: 0 0 22px; }
+
+    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 16px; }
+    .doc-card { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 20px; display: flex; flex-direction: column; gap: 10px; transition: .15s; cursor: pointer; position: relative; overflow: hidden; }
+    .doc-card:hover { transform: translateY(-3px); box-shadow: 0 10px 24px rgba(11, 31, 77, .12); border-color: var(--orange); }
+    .doc-card .icon { width: 46px; height: 46px; border-radius: 10px; background: linear-gradient(135deg, var(--navy), var(--navy-2)); color: var(--orange); display: flex; align-items: center; justify-content: center; font-size: 22px; }
+    .doc-card h3 { margin: 0; font-size: 17px; color: var(--navy); }
+    .doc-card p { margin: 0; color: var(--muted); font-size: 13px; line-height: 1.6; }
+    .doc-card .go { position: absolute; left: 16px; bottom: 16px; color: var(--orange); font-weight: 700; font-size: 13px; }
+
+    .stats-row { display: flex; gap: 14px; margin-bottom: 24px; flex-wrap: wrap; }
+    .stat { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 14px 20px; min-width: 150px; }
+    .stat .n { font-size: 22px; font-weight: 900; color: var(--navy); }
+    .stat .l { font-size: 12px; color: var(--muted); }
+
+    .form-wrap { display: grid; grid-template-columns: 1.05fr 1.35fr; gap: 20px; align-items: start; }
+    @media(max-width:980px) { .form-wrap { grid-template-columns: 1fr; } }
+    .panel { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 20px; }
+    .panel h4 { margin: 0 0 14px; color: var(--navy); font-size: 15px; font-weight: 900; border-bottom: 2px solid var(--bg); padding-bottom: 10px; }
+    .field { margin-bottom: 12px; }
+    .field label { display: block; font-size: 12.5px; font-weight: 700; color: var(--muted); margin-bottom: 5px; }
+    .field input, .field select, .field textarea { width: 100%; padding: 9px 11px; border: 1px solid var(--border); border-radius: 8px; font-size: 14px; background: #fbfcfe; color: var(--text); }
+    .field input:focus, .field select:focus, .field textarea:focus { outline: none; border-color: var(--orange); background: #fff; }
+    .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .field textarea { resize: vertical; min-height: 56px; }
+
+    .items-table { width: 100%; border-collapse: collapse; margin-top: 6px; font-size: 13px; }
+    .items-table th { background: var(--navy); color: #fff; padding: 8px 6px; font-size: 12px; font-weight: 700; }
+    .items-table td { padding: 5px 4px; border: 1px solid var(--border); }
+    .items-table td input { border: none; background: transparent; width: 100%; padding: 6px 4px; font-size: 13px; text-align: center; }
+    .items-table td input:focus { outline: 2px solid var(--orange); border-radius: 4px; }
+    .items-table .rm { background: #fde2e1; color: var(--red); border-radius: 6px; width: 26px; height: 26px; font-weight: 900; }
+    .add-row-btn { margin-top: 10px; background: #eef1f8; color: var(--navy); padding: 8px 14px; border-radius: 8px; font-weight: 700; font-size: 13px; }
+    .add-row-btn:hover { background: #e2e7f4; }
+
+    .btn-primary { background: var(--orange); color: #fff; padding: 11px 20px; border-radius: 9px; font-weight: 800; font-size: 14.5px; }
+    .btn-primary:hover { background: var(--orange-2); }
+    .btn-secondary { background: var(--navy); color: #fff; padding: 11px 20px; border-radius: 9px; font-weight: 800; font-size: 14.5px; }
+    .btn-secondary:hover { background: var(--navy-2); }
+    .btn-pdf { background: #b91c1c; color: #fff; padding: 11px 20px; border-radius: 9px; font-weight: 800; font-size: 14.5px; }
+    .btn-pdf:hover { background: #991b1b; }
+    .btn-ghost { background: #fff; color: var(--navy); border: 1px solid var(--border); padding: 10px 18px; border-radius: 9px; font-weight: 700; font-size: 14px; }
+    .btn-whatsapp { background: var(--whatsapp); color: #fff; padding: 11px 20px; border-radius: 9px; font-weight: 800; font-size: 14.5px; display: inline-flex; align-items: center; gap: 6px; }
+    .btn-whatsapp:hover { background: #1da851; }
+    .btn-whatsapp.disabled { background: #ccc; color: #666; cursor: not-allowed; }
+    .btn-whatsapp.disabled:hover { background: #ccc; }
+    .btn-toggle-total { background: var(--navy); color: #fff; padding: 11px 20px; border-radius: 9px; font-weight: 800; font-size: 14.5px; display: inline-flex; align-items: center; gap: 6px; }
+    .btn-toggle-total:hover { background: var(--navy-2); }
+    .btn-toggle-total.showing { background: var(--orange); }
+    .btn-toggle-total.showing:hover { background: var(--orange-2); }
+    .btn-toggle-number { background: var(--navy); color: #fff; padding: 11px 20px; border-radius: 9px; font-weight: 800; font-size: 14.5px; display: inline-flex; align-items: center; gap: 6px; }
+    .btn-toggle-number:hover { background: var(--navy-2); }
+    .btn-toggle-number.showing { background: var(--orange); }
+    .btn-toggle-number.showing:hover { background: var(--orange-2); }
+
+    .actions-bar { display: flex; gap: 10px; margin-top: 18px; flex-wrap: wrap; }
+
+    .doc-sheet { 
+      background: #fff; 
+      width: 100%; 
+      max-width: 850px; 
+      margin: 0 auto; 
+      border: 1px solid var(--border); 
+      border-radius: 10px; 
+      overflow: hidden; 
+      box-shadow: 0 6px 24px rgba(11, 31, 77, .08); 
+      position: relative;
+    }
+
+    .watermark {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      opacity: 0.10;
+      pointer-events: none;
+      z-index: 10;
+      width: 80%;
+      max-width: 700px;
+      height: auto;
+    }
+    .watermark img {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+
+    .doc-header { background: #fff; padding: 18px 26px 14px; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #eee; gap: 20px; position: relative; z-index: 2; }
+    .doc-header .logo-area { flex-shrink: 0; }
+    .doc-header .logo-area .logo-img { height: 120px; width: auto; border-radius: 10px; object-fit: contain; background: #fff; padding: 5px; border: 1px solid #ddd; display: block; }
+    .doc-header .badge-area { flex-shrink: 0; }
+    .doc-header .badge-area .doc-badge { background: linear-gradient(135deg, var(--navy), var(--navy-2)); color: #fff; border-radius: 12px; padding: 14px 22px; text-align: center; min-width: 160px; border: 2px solid var(--orange); box-shadow: 0 2px 10px rgba(0, 0, 0, .12); }
+    .doc-header .badge-area .doc-badge .t { font-size: 14px; color: #cdd6ea; margin-bottom: 3px; }
+    .doc-header .badge-area .doc-badge .big { font-size: 24px; font-weight: 900; color: var(--orange); }
+    .doc-header .company-info { flex: 1; text-align: center; padding: 0 15px; }
+    .doc-header .company-info .tag { color: var(--orange); font-weight: 700; font-size: 14px; margin-bottom: 2px; }
+    .doc-header .company-info h1 { margin: 0; color: var(--navy); font-size: 26px; font-weight: 900; line-height: 1.3; }
+    .doc-header .company-info h1 span { font-size: 18px; color: var(--orange); display: block; margin-top: 2px; }
+    .doc-header .company-info .slogan { font-size: 14px; color: var(--muted); border-top: 2px solid #f0f0f0; padding-top: 5px; margin-top: 4px; }
+
+    .doc-title-strip { padding: 0 26px 12px; border-bottom: 1px solid #eee; position: relative; z-index: 2; }
+    .doc-title-strip h2 { margin: 10px 0 2px; font-size: 30px; font-weight: 900; color: var(--navy); border-bottom: 4px solid var(--orange); display: inline-block; padding-bottom: 4px; }
+    .doc-title-strip .subtitle { color: var(--muted); font-size: 15px; margin-top: 2px; }
+
+    .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; padding: 14px 26px 12px; position: relative; z-index: 2; }
+    .info-box { border: 1px solid var(--border); border-radius: 8px; padding: 12px 16px; }
+    .info-box h5 { margin: 0 0 8px; color: var(--navy); font-size: 14px; font-weight: 900; }
+    .info-line { display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px dashed #eee; font-size: 14px; }
+    .info-line:last-child { border-bottom: none; }
+    .info-line .k { color: var(--muted); font-weight: 500; }
+    .info-line .v { font-weight: 800; color: var(--text); max-width: 60%; text-align: left; word-break: break-word; }
+    .info-line .v.green-static { color: var(--green) !important; }
+
+    .doc-table-wrap { padding: 0 26px 8px; position: relative; z-index: 2; }
+    table.doc-table { width: 100%; border-collapse: collapse; font-size: 14px; }
+    table.doc-table th { background: var(--navy); color: #fff; padding: 10px 6px; font-weight: 900; }
+    table.doc-table td { padding: 9px 6px; border: 1px solid var(--border); text-align: center; font-weight: 500; }
+
+    .total-bar { margin: 12px 26px 0; background: var(--orange); color: #fff; border-radius: 8px; padding: 12px 18px; display: flex; justify-content: space-between; align-items: center; font-weight: 900; position: relative; z-index: 2; }
+    .total-bar .amt { font-size: 20px; }
+    .total-bar.hidden { display: none; }
+
+    .bank-box { margin: 14px 26px 0; border: 1.5px solid var(--orange); border-radius: 8px; padding: 12px 16px; display: flex; justify-content: space-between; flex-wrap: wrap; gap: 10px; font-size: 13px; align-items: center; background: #fff; position: relative; z-index: 2; }
+    .bank-box .item { display: flex; flex-direction: column; gap: 2px; }
+    .bank-box .item .k { color: var(--muted); font-size: 11px; }
+    .bank-logo-wrapper { display: flex; align-items: center; gap: 10px; }
+    .bank-logo-img { height: 50px; width: auto; object-fit: contain; }
+    .bank-name-wrapper { display: flex; flex-direction: column; line-height: 1.2; }
+    .bank-name-ar { font-size: 16px; font-weight: 900; color: var(--bank-blue); }
+    .bank-name-en { font-size: 12px; font-weight: 600; color: var(--bank-blue); letter-spacing: 0.5px; }
+    .bank-box .item .v { font-weight: 900; color: var(--navy); }
+
+    .notes-box { margin: 14px 26px 0; font-size: 13px; color: var(--muted); padding-bottom: 4px; position: relative; z-index: 2; }
+    .notes-box ul { margin: 4px 0 0; padding-inline-start: 18px; }
+    .notes-box li { margin-bottom: 3px; }
+    .notes-box b { color: var(--navy); font-weight: 900; }
+
+    .sign-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin: 18px 26px 0; font-size: 14px; position: relative; z-index: 2; }
+    .sign-grid .sg h5 { margin: 0 0 8px; color: var(--navy); font-size: 14px; font-weight: 900; }
+    .sign-grid .sl { border-bottom: 1px dashed var(--border); padding: 6px 0; display: flex; justify-content: space-between; font-weight: 500; }
+
+    .doc-footer { margin-top: 20px; background: var(--navy); color: #fff; padding: 12px 26px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; font-size: 14px; position: relative; z-index: 2; }
+    .doc-footer .contact-item { display: flex; align-items: center; gap: 5px; }
+    .doc-footer .quality { background: var(--orange); padding: 6px 16px; border-radius: 8px; font-weight: 900; }
+
+    .receipt-amount-box { margin: 0 26px 12px; border: 1px solid var(--border); border-radius: 10px; padding: 12px 14px; display: flex; justify-content: space-between; align-items: center; position: relative; z-index: 2; }
+    .receipt-amount-box .v { font-weight: 900; color: var(--navy); font-size: 17px; }
+    .receipt-words { margin: 0 26px 12px; font-size: 14px; color: var(--muted); position: relative; z-index: 2; }
+
+    .archive-toolbar { display: flex; gap: 10px; margin-bottom: 16px; flex-wrap: wrap; align-items: center; }
+    .archive-toolbar input { flex: 1; min-width: 220px; padding: 10px 14px; border: 1px solid var(--border); border-radius: 9px; font-size: 14px; }
+    table.archive-table { width: 100%; border-collapse: collapse; background: var(--card); border-radius: 12px; overflow: hidden; }
+    table.archive-table th { background: var(--navy); color: #fff; padding: 11px 10px; font-size: 13px; text-align: right; }
+    table.archive-table td { padding: 10px; border-bottom: 1px solid var(--border); font-size: 13px; }
+    table.archive-table tr:hover td { background: #f8f9fc; }
+    .pill { padding: 4px 10px; border-radius: 20px; font-size: 11.5px; font-weight: 700; }
+    .pill.pending { background: #FFF3D6; color: #9A6B00; }
+    .pill.approved { background: #DFF6E7; color: var(--green); }
+    .pill.rejected { background: #FDE3E1; color: var(--red); }
+    .row-actions button { background: none; padding: 4px 7px; border-radius: 6px; font-size: 13px; }
+    .row-actions button:hover { background: var(--bg); }
+    .row-actions .btn-whatsapp-small { background: var(--whatsapp); color: #fff; border-radius: 6px; padding: 4px 8px; font-size: 13px; display: inline-flex; align-items: center; gap: 4px; }
+    .row-actions .btn-whatsapp-small:hover { background: #1da851; }
+    .row-actions .btn-whatsapp-small.disabled { background: #ccc; color: #666; cursor: not-allowed; }
+    .row-actions .btn-whatsapp-small.disabled:hover { background: #ccc; }
+    .empty-state { text-align: center; padding: 60px 20px; color: var(--muted); }
+    .empty-state .em { font-size: 40px; margin-bottom: 10px; }
+
+    .settings-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+    @media(max-width:900px) { .settings-grid { grid-template-columns: 1fr; } }
+
+    #toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: var(--navy); color: #fff; padding: 12px 22px; border-radius: 10px; font-weight: 700; font-size: 14px; box-shadow: 0 8px 20px rgba(0, 0, 0, .2); opacity: 0; pointer-events: none; transition: .25s; z-index: 999; }
+    #toast.show { opacity: 1; transform: translateX(-50%) translateY(-6px); }
+
+    .loading-screen { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(255,255,255,0.95); display: flex; align-items: center; justify-content: center; z-index: 9999; flex-direction: column; gap: 16px; }
+    .loading-spinner { width: 50px; height: 50px; border: 4px solid var(--border); border-top-color: var(--orange); border-radius: 50%; animation: spin 1s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    #preview .doc-sheet, #print-area .doc-sheet { color: #000 !important; background: #fff !important; }
+    #preview .doc-sheet *, #print-area .doc-sheet * { color: #000 !important; border-color: #aaa !important; }
+    #preview .doc-sheet .muted, #print-area .doc-sheet .muted { color: #222 !important; }
+    #preview .doc-sheet .total-bar, #print-area .doc-sheet .total-bar { background: #F97316 !important; color: #fff !important; }
+    #preview .doc-sheet .total-bar *, #print-area .doc-sheet .total-bar * { color: #fff !important; }
+    #preview .doc-sheet .total-bar.hidden, #print-area .doc-sheet .total-bar.hidden { display: none !important; }
+    #preview .doc-sheet .doc-badge, #print-area .doc-sheet .doc-badge { background: linear-gradient(135deg, #0B1F4D, #132a63) !important; border-color: #F97316 !important; }
+    #preview .doc-sheet .doc-badge *, #print-area .doc-sheet .doc-badge * { color: #fff !important; }
+    #preview .doc-sheet .doc-badge .big, #print-area .doc-sheet .doc-badge .big { color: #F97316 !important; }
+    #preview .doc-sheet .info-line .k, #print-area .doc-sheet .info-line .k { color: #333 !important; }
+    #preview .doc-sheet .info-line .v, #print-area .doc-sheet .info-line .v { color: #000 !important; }
+    #preview .doc-sheet .doc-header, #print-area .doc-sheet .doc-header { border-bottom: 2px solid #aaa !important; }
+    #preview .doc-sheet .doc-title-strip, #print-area .doc-sheet .doc-title-strip { border-bottom: 1px solid #aaa !important; }
+    #preview .doc-sheet .logo-img, #print-area .doc-sheet .logo-img { height: 120px !important; width: auto !important; border-color: #aaa !important; }
+    #preview .doc-sheet table.doc-table td, #print-area .doc-sheet table.doc-table td { color: #000 !important; font-weight: 600 !important; }
+    #preview .doc-sheet table.doc-table th, #print-area .doc-sheet table.doc-table th { background: #0B1F4D !important; color: #fff !important; }
+    #preview .doc-sheet .company-info .slogan, #print-area .doc-sheet .company-info .slogan { border-top-color: #aaa !important; }
+    #preview .doc-sheet .company-info h1, #print-area .doc-sheet .company-info h1 { line-height: 1.4 !important; }
+    #preview .doc-sheet .info-line .v.green-static, #print-area .doc-sheet .info-line .v.green-static { color: #1E9E5A !important; }
+    #preview .doc-sheet .bank-name-ar, #print-area .doc-sheet .bank-name-ar,
+    #preview .doc-sheet .bank-name-en, #print-area .doc-sheet .bank-name-en { color: #003366 !important; }
+    #preview .doc-sheet .bank-logo-img, #print-area .doc-sheet .bank-logo-img { height: 50px !important; width: auto !important; filter: none !important; opacity: 1 !important; }
+    #preview .doc-sheet .watermark, #print-area .doc-sheet .watermark { opacity: 0.10 !important; width: 80% !important; max-width: 700px !important; }
+
+
+    .exec-card { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 20px; }
+    .exec-text { width: 100%; min-height: 280px; padding: 14px; border: 1px solid var(--border); border-radius: 10px; font-family: 'Tajawal', sans-serif; font-size: 14px; line-height: 1.9; resize: vertical; background: #fbfcfe; }
+    .exec-sheet { background:#fff; width:100%; max-width:850px; margin:0 auto; border:1px solid var(--border); border-radius:10px; overflow:hidden; box-shadow:0 6px 24px rgba(11,31,77,.08); box-sizing:border-box; }
+    .exec-body { padding: 24px 28px; position: relative; z-index: 2; }
+    .exec-pdf-a4 {
+      width:210mm !important;
+      min-width:210mm !important;
+      max-width:210mm !important;
+      height:297mm !important;
+      min-height:297mm !important;
+      max-height:297mm !important;
+      margin:0 !important;
+      padding:0 !important;
+      border:0 !important;
+      border-radius:0 !important;
+      box-shadow:none !important;
+      overflow:hidden !important;
+      box-sizing:border-box !important;
+      display:flex !important;
+      flex-direction:column !important;
+      direction:rtl !important;
+      background:#fff !important;
+    }
+    .exec-pdf-a4 .doc-header,
+    .exec-pdf-a4 .doc-title-strip,
+    .exec-pdf-a4 .exec-body,
+    .exec-pdf-a4 .doc-footer { flex-shrink:0; box-sizing:border-box !important; }
+    .exec-pdf-a4 .exec-body { flex:1 1 auto !important; }
+    .exec-pdf-a4 .doc-footer { margin-top:auto !important; width:100% !important; }
+    .exec-pdf-a4 .watermark { left:50% !important; top:52% !important; transform:translate(-50%,-50%) !important; }
+    .exec-row { display:grid; grid-template-columns:180px 1fr; gap:12px; padding:10px 0; border-bottom:1px dashed #ddd; font-size:15px; }
+    .exec-row:last-child { border-bottom:none; }
+    .exec-row .k { color:var(--muted); font-weight:700; }
+    .exec-row .v { color:var(--text); font-weight:800; word-break:break-word; }
+    .btn-exec { background:#6d28d9; color:#fff; padding:7px 10px; border-radius:6px; font-weight:800; font-size:12px; }
+    .btn-exec:hover { background:#5b21b6; }
+
+    @media print {
+      body * { visibility: hidden; }
+      #print-area, #print-area * { visibility: visible; }
+      #print-area { position: absolute; top: 0; right: 0; left: 0; margin: 0; padding: 0; }
+      .doc-sheet { box-shadow: none; border: none; max-width: 100%; }
+      @page { size: A4; margin: 8mm; }
+    }
+  </style>
+</head>
+<body>
+
+<div id="loading-screen" class="loading-screen">
+  <div class="loading-spinner"></div>
+  <div style="font-weight:700;color:var(--navy);">جاري تحميل البيانات...</div>
+</div>
+
+<div id="topbar">
+  <div class="brand"><span class="dot"></span> صروح الثبات — نظام العروض</div>
+  <nav id="nav">
+    <button data-r="dashboard">الرئيسية</button>
+    <button data-r="archive">الأرشيف</button>
+    <button data-r="settings">الإعدادات</button>
+  </nav>
+</div>
+
+<div id="app"></div>
+<div id="toast"></div>
+
+<script type="module">
+  // Import Firebase
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.17.1/firebase-app.js";
+  import { getDatabase, ref, set, get, onValue, remove, child } from "https://www.gstatic.com/firebasejs/12.17.1/firebase-database.js";
+
+  // Firebase configuration
+  const firebaseConfig = {
+    apiKey: "AIzaSyAdUXus0SNdhHrhg5wDYnK4QIziElakMTw",
+    authDomain: "sorouh-al-thabat-company.firebaseapp.com",
+    databaseURL: "https://sorouh-al-thabat-company-default-rtdb.firebaseio.com",
+    projectId: "sorouh-al-thabat-company",
+    storageBucket: "sorouh-al-thabat-company.firebasestorage.app",
+    messagingSenderId: "475781176329",
+    appId: "1:475781176329:web:5619313070f5a311e5acd8",
+    measurementId: "G-TCC3GP1BF5"
+  };
+
+  // Initialize Firebase
+  const app = initializeApp(firebaseConfig);
+  const db = getDatabase(app);
+
+  // ============================= DATA LAYER =============================
+  const DEFAULT_SETTINGS = {
+    companyLine1: 'صروح الثبات',
+    companyLine2: 'الخرسانة الجاهزة',
+    slogan: 'جَودة تُبنَى عليها الثقة',
+    taxNumber: '314629964600003',
+    address: 'الرياض - المملكة العربية السعودية',
+    phone: '050 834 6559',
+    email: 'sales@suroohgroup.com',
+    website: 'www.suroohgroup.com',
+    whatsappNumber: '966508346559',
+    bankName: 'مصرف الراجحي',
+    bankNameEn: 'alrajhi bank',
+    accountNumber: '660000010006089725820',
+    iban: 'SA4480000660608019725820',
+    year: '2026',
+    startNumber: 1,
+    nextNumber: 1,
+    fixedNotes: '🔔 العرض ساري لمدة أسبوع. يلتزم العميل بتجهيز الموقع.',
+    fixedFields: {
+      location: true,
+      taxNumberClient: true,
+      paymentMethod: false,
+      project: false,
+      materialType: false,
+      taxPercent: true,
+      workDescription: false,
+      preparedBy: false,
+      location2: false
+    },
+    fixedValues: {
+      location: 'الرياض - المملكة العربية السعودية',
+      taxNumberClient: '314629964600003',
+      paymentMethod: 'تحويل بنكي',
+      project: '',
+      materialType: 'خرسانة جاهزة',
+      taxPercent: 15,
+      workDescription: '',
+      preparedBy: '',
+      location2: ''
+    },
+    showTotal: true,
+    // تخزين الملاحظات الثابتة لكل نوع
+    typeFixedNotes: {
+      concrete: '🔔 عرض سعر الخرسانة الجاهزة ساري لمدة أسبوع.\nيرجى التأكد من تجهيز الموقع.',
+      interlock: '🔔 عرض سعر الإنتر لوك ساري لمدة 10 أيام.\nيتم التسليم حسب الكمية المطلوبة.',
+      block: '🔔 عرض سعر البلوك ساري لمدة أسبوع.\nالأسعار تشمل التوصيل للموقع.',
+      general: '🔔 عرض سعر مواد البناء ساري لمدة أسبوع.\nالأسعار قابلة للتغيير حسب الكمية.',
+      claim: '🔔 المطالبة المالية صالحة لمدة 30 يوماً من تاريخ الإصدار.',
+      precast: '🔔 عرض سعر المواد المسبقة الصب ساري لمدة أسبوعين.\nيتم التسليم حسب الجدول الزمني المتفق عليه.'
+    }
+  };
+
+  function roundToTwo(num) {
+    const n = parseFloat(num);
+    if (isNaN(n) || !isFinite(n)) return 0;
+    return Math.round(n * 100) / 100;
+  }
+
+  function safeNumber(value) {
+    const num = parseFloat(value);
+    if (isNaN(num) || !isFinite(num)) return 0;
+    return num;
+  }
+
+  let SETTINGS = { ...DEFAULT_SETTINGS };
+  let DOCS = [];
+
+  // Firebase references
+  const settingsRef = ref(db, 'settings');
+  const docsRef = ref(db, 'documents');
+  const metaRef = ref(db, 'meta');
+
+  // Load settings from Firebase
+  async function loadSettings() {
+    try {
+      const snapshot = await get(settingsRef);
+      if (snapshot.exists()) {
+        SETTINGS = { ...DEFAULT_SETTINGS, ...snapshot.val() };
+        // التأكد من وجود typeFixedNotes
+        if (!SETTINGS.typeFixedNotes) {
+          SETTINGS.typeFixedNotes = { ...DEFAULT_SETTINGS.typeFixedNotes };
+        }
+      } else {
+        SETTINGS = { ...DEFAULT_SETTINGS };
+        await set(settingsRef, SETTINGS);
+      }
+    } catch (error) {
+      console.error('Error loading settings:', error);
+      SETTINGS = { ...DEFAULT_SETTINGS };
+    }
+  }
+
+  // Save settings to Firebase
+  async function saveSettings(s) {
+    try {
+      await set(settingsRef, s);
+      SETTINGS = { ...s };
+    } catch (error) {
+      console.error('Error saving settings:', error);
+      toast('❌ خطأ في حفظ الإعدادات');
+    }
+  }
+
+  // Load documents from Firebase with real-time listener
+  function loadDocs() {
+    onValue(docsRef, (snapshot) => {
+      if (snapshot.exists()) {
+        const docsData = snapshot.val();
+        DOCS = Object.keys(docsData).map(key => ({ ...docsData[key], id: key }));
+        DOCS.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+      } else {
+        DOCS = [];
+      }
+      
+      const loadingScreen = document.getElementById('loading-screen');
+      if (loadingScreen) {
+        loadingScreen.style.display = 'none';
+      }
+      
+      const hash = location.hash.replace('#/', '') || 'dashboard';
+      if (hash === 'dashboard' || hash === 'archive') {
+        render();
+      }
+    }, (error) => {
+      console.error('Error loading documents:', error);
+      const loadingScreen = document.getElementById('loading-screen');
+      if (loadingScreen) {
+        loadingScreen.innerHTML = '<div style="color:red;font-weight:700;">❌ خطأ في تحميل البيانات</div>';
+      }
+    });
+  }
+
+  // Save document to Firebase
+  async function saveDoc(doc) {
+    try {
+      const docRef = ref(db, `documents/${doc.id}`);
+      await set(docRef, doc);
+      return true;
+    } catch (error) {
+      console.error('Error saving document:', error);
+      toast('❌ خطأ في حفظ المستند');
+      return false;
+    }
+  }
+
+  // Delete document from Firebase
+  async function deleteDoc(id) {
+    try {
+      const docRef = ref(db, `documents/${id}`);
+      await remove(docRef);
+      return true;
+    } catch (error) {
+      console.error('Error deleting document:', error);
+      toast('❌ خطأ في حذف المستند');
+      return false;
+    }
+  }
+
+  // Get next document number safely
+  async function getNextDocNumber() {
+    try {
+      const snapshot = await get(child(metaRef, 'nextNumber'));
+      if (snapshot.exists()) {
+        return snapshot.val();
+      } else {
+        const startNum = SETTINGS.startNumber || 1;
+        await set(child(metaRef, 'nextNumber'), startNum);
+        return startNum;
+      }
+    } catch (error) {
+      console.error('Error getting next number:', error);
+      return SETTINGS.startNumber || 1;
+    }
+  }
+
+  // Commit document number (increment)
+  async function commitDocNumber() {
+    try {
+      const currentNum = await getNextDocNumber();
+      await set(child(metaRef, 'nextNumber'), currentNum + 1);
+      SETTINGS.nextNumber = currentNum + 1;
+      await saveSettings(SETTINGS);
+    } catch (error) {
+      console.error('Error committing doc number:', error);
+    }
+  }
+
+  function nextDocNumber() {
+    const n = SETTINGS.nextNumber || SETTINGS.startNumber || 1;
+    return 'Q-' + SETTINGS.year + '-' + String(n).padStart(3, '0');
+  }
+
+  function uid() {
+    return 'd' + Date.now() + Math.random().toString(36).slice(2, 7);
+  }
+
+  function todayStr() {
+    return new Date().toLocaleDateString('en-GB');
+  }
+
+  function money(n) {
+    const num = safeNumber(n);
+    return num.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  }
+
+  function toast(m) {
+    const t = document.getElementById('toast');
+    t.textContent = m;
+    t.classList.add('show');
+    clearTimeout(window._toastT);
+    window._toastT = setTimeout(() => t.classList.remove('show'), 2200);
+  }
+
+  function getWhatsAppLink(doc) {
+    let contactNumber = doc.contact || '';
+    contactNumber = contactNumber.replace(/[\s\-\(\)]/g, '');
+    if (!contactNumber) {
+      return null;
+    }
+    if (contactNumber.startsWith('0')) {
+      contactNumber = '966' + contactNumber.substring(1);
+    } else if (!contactNumber.startsWith('966')) {
+      contactNumber = '966' + contactNumber;
+    }
+    return `https://wa.me/${contactNumber}`;
+  }
+
+  function numberToArabicWords(num) {
+    num = Math.floor(Number(num) || 0);
+    if (num === 0) return 'صفر ريال سعودي فقط لا غير';
+    const ones = ['', 'واحد', 'اثنان', 'ثلاثة', 'أربعة', 'خمسة', 'ستة', 'سبعة', 'ثمانية', 'تسعة', 'عشرة', 'أحد عشر', 'اثنا عشر', 'ثلاثة عشر',
+      'أربعة عشر', 'خمسة عشر', 'ستة عشر', 'سبعة عشر', 'ثمانية عشر', 'تسعة عشر'
+    ];
+    const tens = ['', 'عشرة', 'عشرون', 'ثلاثون', 'أربعون', 'خمسون', 'ستون', 'سبعون', 'ثمانون', 'تسعون'];
+    const hundreds = ['', 'مائة', 'مئتان', 'ثلاثمائة', 'أربعمائة', 'خمسمائة', 'ستمائة', 'سبعمائة', 'ثمانمائة', 'تسعمائة'];
+
+    function threeDigits(n) {
+      let s = '';
+      const h = Math.floor(n / 100),
+        r = n % 100;
+      if (h > 0) s += hundreds[h];
+      if (r > 0) {
+        if (s) s += ' و';
+        if (r < 20) s += ones[r];
+        else {
+          const t = Math.floor(r / 10),
+            o = r % 10;
+          s += (o > 0 ? ones[o] + ' و' : '') + tens[t];
+        }
+      }
+      return s;
+    }
+
+    function group(n, s, d, p) {
+      if (n === 0) return '';
+      if (n === 1) return s;
+      if (n === 2) return d;
+      if (n >= 3 && n <= 10) return threeDigits(n) + ' ' + p;
+      return threeDigits(n) + ' ' + s;
+    }
+    const m = Math.floor(num / 1000000),
+      th = Math.floor((num % 1000000) / 1000),
+      rest = num % 1000;
+    let parts = [];
+    if (m > 0) parts.push(group(m, 'مليون', 'مليونان', 'ملايين'));
+    if (th > 0) parts.push(group(th, 'ألف', 'ألفان', 'آلاف'));
+    if (rest > 0) parts.push(threeDigits(rest));
+    return (parts.filter(Boolean).join(' و') || 'صفر') + ' ريال سعودي فقط لا غير';
+  }
+
+  const TYPES = {
+    concrete: { key: 'concrete', title: 'عرض سعر خرسانة جاهزة', badge: 'خرسانة جاهزة', itemLabel: 'نوع الخرسانة', icon: '🚛',
+      desc: 'خرسانة جاهزة بمقاومات وأنواع أسمنت مختلفة', kind: 'quote', isConcrete: true },
+    interlock: { key: 'interlock', title: 'عرض سعر إنتر لوك', badge: 'إنتر لوك', itemLabel: 'الوصف', icon: '🧱',
+      desc: 'أشكال إنتر لوك متنوعة', kind: 'quote', simpleTable: true, terms: true },
+    block: { key: 'block', title: 'عرض سعر بلوك', badge: 'بلوك', itemLabel: 'نوع البلوك', icon: '🟫', desc: 'بلوك عادي وعازل بمقاسات مختلفة',
+      kind: 'quote', simpleTable: true, terms: true, priceUnitNote: 'لكل 1000 حبة', isBlock: true },
+    general: { key: 'general', title: 'عرض سعر مواد بناء', badge: 'مواد بناء عامة', itemLabel: 'البيان', icon: '🏗️',
+      desc: 'حديد، رمل، أسمنت، وأخشاب', kind: 'quote' },
+    claim: { key: 'claim', title: 'مطالبة مالية', badge: 'مطالبة مالية', itemLabel: 'البيان', icon: '📄', desc: 'نفس قالب عرض السعر بعنوان مطالبة',
+      kind: 'quote' },
+    receipt: { key: 'receipt', title: 'سند استلام', badge: 'سند استلام', itemLabel: '', icon: '🧾', desc: 'إيصال قبض مبلغ مع بيانات السداد',
+      kind: 'receipt' },
+    precast: { key: 'precast', title: 'مواد أسمنتية مسبقة الصب', badge: 'Precast', itemLabel: 'البيان', icon: '🏗️',
+      desc: 'مواد أسمنتية مسبقة الصب - Precast', kind: 'quote', isPrecast: true, terms: true }
+  };
+
+  // ============================= ROUTER =============================
+  function go(r) { location.hash = r; }
+  window.addEventListener('hashchange', render);
+  window.addEventListener('DOMContentLoaded', async () => {
+    await loadSettings();
+    loadDocs();
+    if (!location.hash) location.hash = '#/dashboard';
+    render();
+  });
+
+  function render() {
+    const hash = location.hash.replace('#/', '') || 'dashboard';
+    const parts = hash.split('/');
+    document.querySelectorAll('#nav button').forEach(b => b.classList.remove('active'));
+    const app = document.getElementById('app');
+    if (parts[0] === 'dashboard') { setActive('dashboard');
+      app.innerHTML = renderDashboard();
+      bindDashboard(); } else if (parts[0] === 'archive') { setActive('archive');
+      app.innerHTML = renderArchive();
+      bindArchive(); } else if (parts[0] === 'settings') { setActive('settings');
+      app.innerHTML = renderSettings();
+      bindSettings(); } else if (parts[0] === 'form') { app.innerHTML = renderForm(parts[1], parts[2]);
+      bindForm(parts[1], parts[2]); } else if (parts[0] === 'view') { app.innerHTML = renderViewPage(parts[1]);
+      bindViewPage(parts[1]); } else if (parts[0] === 'execution') { app.innerHTML = renderExecutionPage(parts[1]);
+      bindExecutionPage(parts[1]); } else { app.innerHTML = renderDashboard();
+      bindDashboard(); }
+    window.scrollTo(0, 0);
+  }
+
+  function setActive(n) {
+    const b = document.querySelector('#nav button[data-r="' + n + '"]');
+    if (b) b.classList.add('active');
+  }
+  document.getElementById('nav').addEventListener('click', e => {
+    const b = e.target.closest('button[data-r]');
+    if (b) go('#/' + b.dataset.r);
+  });
+
+  // ============================= DASHBOARD =============================
+  function renderDashboard() {
+    const total = DOCS.length,
+      quotes = DOCS.filter(d => TYPES[d.type] && TYPES[d.type].kind === 'quote').length,
+      receipts = DOCS.filter(d => TYPES[d.type] && TYPES[d.type].kind === 'receipt').length;
+    const cards = Object.values(TYPES).map(t => `<div class="doc-card" data-new="${t.key}"><div class="icon">${t.icon}</div><h3>${t.title}</h3><p>${t.desc}</p><span class="go">إنشاء جديد ←</span></div>`).join('');
+    return `<h1 class="page-title">أهلاً بك 👋</h1><p class="page-sub">اختر نوع المستند. الرقم التالي: <b style="color:var(--navy)">${nextDocNumber()}</b></p>
+  <div class="stats-row"><div class="stat"><div class="n">${total}</div><div class="l">إجمالي المستندات</div></div><div class="stat"><div class="n">${quotes}</div><div class="l">عروض / مطالبات</div></div><div class="stat"><div class="n">${receipts}</div><div class="l">سندات استلام</div></div></div>
+  <div class="grid">${cards}</div>`;
+  }
+
+  function bindDashboard() {
+    document.querySelectorAll('.doc-card').forEach(c => c.addEventListener('click', () => go('#/form/' + c.dataset.new +
+      '/new')));
+  }
+
+  // ============================= FORM =============================
+  function blankDoc(type) {
+    const t = TYPES[type];
+    const fixedVals = SETTINGS.fixedValues || DEFAULT_SETTINGS.fixedValues;
+    const fixedFields = SETTINGS.fixedFields || DEFAULT_SETTINGS.fixedFields;
+
+    const base = {
+      id: uid(),
+      type,
+      number: nextDocNumber(),
+      createdAt: Date.now(),
+      status: 'pending',
+      date: todayStr(),
+      showNumber: true,
+      showTotal: true,
+      showBank: true
+    };
+
+    if (t.kind === 'quote') {
+      let extraFields = {};
+      if (t.isPrecast) {
+        extraFields = {
+          size: '',
+          unitPriceWithoutTax: 0,
+          unitPriceWithTax: 0
+        };
+      }
+      return {
+        ...base,
+        customerName: '',
+        contact: '',
+        taxNumberClient: fixedFields.taxNumberClient ? (fixedVals.taxNumberClient || '') : '',
+        paymentMethod: fixedFields.paymentMethod ? (fixedVals.paymentMethod || '') : '',
+        location: fixedFields.location ? (fixedVals.location || '') : '',
+        project: fixedFields.project ? (fixedVals.project || '') : '',
+        materialType: fixedFields.materialType ? (fixedVals.materialType || '') : '',
+        taxPercent: fixedFields.taxPercent ? (fixedVals.taxPercent || 15) : 15,
+        workDescription: fixedFields.workDescription ? (fixedVals.workDescription || '') : '',
+        preparedBy: fixedFields.preparedBy ? (fixedVals.preparedBy || '') : '',
+        location2: fixedFields.location2 ? (fixedVals.location2 || '') : '',
+        priceTerms: '',
+        deliveryTerms: '',
+        notes: '',
+        items: [emptyItem(t.isPrecast)],
+        ...extraFields
+      };
+    }
+    return { ...base, receivedFrom: '', amount: '', amountFor: '', paymentMethod: 'تحويل بنكي', txnRef: '', bankName: '',
+      notes: '', receiverName: '', receiverDate: todayStr(), payerName: '', payerDate: todayStr() };
+  }
+
+  function emptyItem(isPrecast = false) {
+    if (isPrecast) {
+      return { id: uid(), desc: '', size: '', qty: 1, unitPriceWithoutTax: 0, unitPriceWithTax: 0, totalWithTax: 0 };
+    }
+    return { id: uid(), desc: '', unit: '', qty: 1, price: 0, priceWithTax: 0, totalWithTax: 0 };
+  }
+
+  function getDoc(type, id) {
+    if (id === 'new') return blankDoc(type);
+    const doc = DOCS.find(d => d.id === id);
+    if (doc) {
+      if (doc.showNumber === undefined) doc.showNumber = true;
+      if (doc.showTotal === undefined) doc.showTotal = true;
+      if (doc.showBank === undefined) doc.showBank = true;
+      return doc;
+    }
+    return blankDoc(type);
+  }
+
+  function renderForm(type, id) {
+    const t = TYPES[type];
+    if (!t) return '<p>نوع غير معروف</p>';
+    const doc = getDoc(type, id);
+    window._currentDoc = JSON.parse(JSON.stringify(doc));
+    const showTotal = doc.showTotal !== undefined ? doc.showTotal : true;
+    const toggleBtnText = showTotal ? '🔽 إخفاء الإجمالي' : '🔼 إظهار الإجمالي';
+    const toggleBtnClass = showTotal ? 'btn-toggle-total showing' : 'btn-toggle-total';
+    const showNumber = doc.showNumber !== undefined ? doc.showNumber : true;
+    const toggleNumText = showNumber ? '🔢 إخفاء رقم العرض' : '🔢 إظهار رقم العرض';
+    const toggleNumClass = showNumber ? 'btn-toggle-number showing' : 'btn-toggle-number';
+    const showBank = doc.showBank !== undefined ? doc.showBank : true;
+    const toggleBankText = showBank ? '🏦 إخفاء بيانات البنك' : '🏦 إظهار بيانات البنك';
+    const toggleBankClass = showBank ? 'btn-toggle-number showing' : 'btn-toggle-number';
+    
+    return `<h1 class="page-title">${t.title}</h1><p class="page-sub">رقم المستند: <b style="color:var(--orange)">${doc.number}</b> — ${id==='new'?'مستند جديد':'تعديل'}</p>
+  <div class="form-wrap"><div id="form-panels">${t.kind==='quote'?quoteFormPanels(t,window._currentDoc):receiptFormPanels(window._currentDoc)}</div>
+  <div><div class="panel" style="padding:14px;"><h4>معاينة حية</h4><div id="preview">${t.kind==='quote'?quotePreview(t,window._currentDoc):receiptPreview(window._currentDoc)}</div></div></div></div>
+  <div class="actions-bar" style="margin-top:10px;">
+    <button class="${toggleBtnClass}" id="toggle-total-btn">${toggleBtnText}</button>
+    <button class="${toggleNumClass}" id="toggle-number-btn">${toggleNumText}</button>
+    <button class="${toggleBankClass}" id="toggle-bank-btn">${toggleBankText}</button>
+  </div>`;
+  }
+
+  function quoteFormPanels(t, doc) {
+    const fixedFields = SETTINGS.fixedFields || DEFAULT_SETTINGS.fixedFields;
+    const fixedLabel = (fieldKey) => fixedFields[fieldKey] ? ' <span style="color:var(--green);font-size:11px;">🟢 ثابت</span>' : '';
+    
+    let qtyLabel = 'الكمية';
+    let priceLabel = 'سعر الوحدة قبل الضريبة';
+    let priceWithTaxLabel = 'سعر الوحدة بعد الضريبة';
+    let sizeLabel = '';
+    
+    if (t.isBlock) {
+      priceLabel = 'سعر الحبة قبل الضريبة';
+      priceWithTaxLabel = 'سعر الحبة بعد الضريبة';
+    }
+    
+    if (t.isConcrete) {
+      qtyLabel = 'الكمية متر مكعب';
+      priceLabel = 'سعر المتر قبل الضريبة';
+      priceWithTaxLabel = 'سعر المتر شامل الضريبة';
+    } else if (t.isPrecast) {
+      qtyLabel = 'الكمية';
+      priceLabel = 'سعر الوحدة قبل الضريبة';
+      sizeLabel = 'المقاس';
+      priceWithTaxLabel = 'سعر الوحدة بعد الضريبة';
+    }
+
+    return `<div class="panel"><h4>بيانات العميل</h4>
+    <div class="field"><label>تاريخ العرض</label><input data-f="date" value="${doc.date}"></div>
+    <div class="field"><label>اسم العميل${fixedLabel('customerName')}</label><input data-f="customerName" value="${doc.customerName}" placeholder="اسم العميل أو المنشأة"></div>
+    <div class="field"><label>جهة الاتصال${fixedLabel('contact')}</label><input data-f="contact" value="${doc.contact}"></div>
+    <div class="field"><label>الرقم الضريبي للعميل${fixedLabel('taxNumberClient')}</label><input data-f="taxNumberClient" value="${doc.taxNumberClient}"></div>
+    <div class="field"><label>طريقة الدفع${fixedLabel('paymentMethod')}</label><input data-f="paymentMethod" value="${doc.paymentMethod}"></div>
+    <div class="field"><label>الموقع${fixedLabel('location')}</label><input data-f="location" value="${doc.location}"></div></div>
+  <div class="panel"><h4>تفاصيل العرض</h4>
+    <div class="field"><label>المشروع${fixedLabel('project')}</label><input data-f="project" value="${doc.project}"></div>
+    ${!t.isPrecast ? `<div class="field"><label>${t.itemLabel==='البيان'?'نوع المواد':'نوع '+t.badge}${fixedLabel('materialType')}</label><input data-f="materialType" value="${doc.materialType}"></div>` : ''}
+    <div class="field"><label>الضريبة (%)${fixedLabel('taxPercent')}</label><input data-f="taxPercent" type="number" value="${doc.taxPercent}"></div>
+    <div class="field"><label>وصف الأعمال${fixedLabel('workDescription')}</label><textarea data-f="workDescription">${doc.workDescription}</textarea></div>
+    <div class="field"><label>مقدم العرض${fixedLabel('preparedBy')}</label><input data-f="preparedBy" value="${doc.preparedBy}"></div>
+    <div class="field"><label>الموقع (تفاصيل)${fixedLabel('location2')}</label><input data-f="location2" value="${doc.location2}"></div>
+    ${t.terms?`<div class="field"><label>شروط الأسعار</label><textarea data-f="priceTerms">${doc.priceTerms}</textarea></div><div class="field"><label>شروط التسليم</label><textarea data-f="deliveryTerms">${doc.deliveryTerms}</textarea></div>`:''}
+    <div class="field"><label>ملاحظات إضافية</label><textarea data-f="notes">${doc.notes}</textarea></div></div>
+  <div class="panel" style="grid-column:1/-1;"><h4>بنود العرض ${t.priceUnitNote?'<span style="color:var(--muted);font-weight:400;font-size:12px;">('+t.priceUnitNote+')</span>':''}</h4>
+    <table class="items-table"><thead><tr><th style="width:26px;">م</th><th>${t.itemLabel}</th>${t.isPrecast ? `<th style="width:80px;">${sizeLabel}</th>` : `<th style="width:80px;">الوحدة</th>`}<th style="width:70px;">${qtyLabel}</th><th style="width:100px;">${priceLabel}</th><th style="width:110px;">${priceWithTaxLabel}</th><th style="width:90px;">الضريبة</th><th style="width:100px;">الإجمالي شامل الضريبة</th><th style="width:30px;"></th></tr></thead>
+    <tbody id="items-body">${doc.items.map((it,i)=>itemRow(it,i, t, doc.taxPercent)).join('')}</tbody></table>
+    <button class="add-row-btn" id="add-row">+ إضافة صف</button></div>
+  <div class="actions-bar" style="grid-column:1/-1;">
+    <button class="btn-primary" id="save-doc">💾 حفظ في الأرشيف</button>
+    <button class="btn-pdf" id="download-pdf-form">📥 تحميل PDF</button>
+    <button class="btn-secondary" id="save-print">🖨️ حفظ وطباعة</button>
+    <button class="btn-ghost" id="cancel-form">إلغاء</button></div>`;
+  }
+
+  function itemRow(it, i, t, taxPercent) {
+    const tax = safeNumber(taxPercent);
+    
+    let priceLabel = 'سعر الوحدة قبل الضريبة';
+    let priceWithTaxLabel = 'سعر الوحدة بعد الضريبة';
+    if (t.isBlock) {
+      priceLabel = 'سعر الحبة قبل الضريبة';
+      priceWithTaxLabel = 'سعر الحبة بعد الضريبة';
+    }
+    
+    if (t.isPrecast) {
+      const qty = safeNumber(it.qty);
+      const unitPriceWithoutTax = safeNumber(it.unitPriceWithoutTax);
+      const unitPriceWithTax = safeNumber(it.unitPriceWithTax);
+      const totalBeforeTax = roundToTwo(qty * unitPriceWithoutTax);
+      const taxAmount = roundToTwo(totalBeforeTax * (tax / 100));
+      const totalWithTax = roundToTwo(totalBeforeTax + taxAmount);
+      
+      return `<tr data-id="${it.id}">
+        <td>${i+1}</td>
+        <td><input data-if="desc" value="${it.desc||''}" style="text-align:right;"></td>
+        <td><input data-if="size" value="${it.size||''}" style="text-align:center;"></td>
+        <td><input data-if="qty" type="text" value="${qty || ''}" class="item-qty" style="text-align:center;"></td>
+        <td><input data-if="unitPriceWithoutTax" type="text" value="${unitPriceWithoutTax || ''}" class="item-price" style="text-align:center;"></td>
+        <td><input data-if="unitPriceWithTax" type="text" value="${unitPriceWithTax || ''}" class="item-price-with-tax" style="text-align:center;color:var(--orange);font-weight:700;"></td>
+        <td style="color:var(--green);font-weight:700;">${money(taxAmount)}</td>
+        <td><input data-if="totalWithTax" type="text" value="${totalWithTax || ''}" class="item-total" style="font-weight:800;color:var(--navy);text-align:center;"></td>
+        <td><button class="rm" data-rm="${it.id}">×</button></td>
+      </tr>`;
+    }
+    
+    const qty = safeNumber(it.qty);
+    const price = safeNumber(it.price);
+    const priceWithTax = safeNumber(it.priceWithTax);
+    const totalBeforeTax = roundToTwo(qty * price);
+    const taxAmount = roundToTwo(totalBeforeTax * (tax / 100));
+    const totalWithTax = roundToTwo(totalBeforeTax + taxAmount);
+    
+    return `<tr data-id="${it.id}">
+      <td>${i+1}</td>
+      <td><input data-if="desc" value="${it.desc||''}" style="text-align:right;"></td>
+      <td><input data-if="unit" value="${it.unit||''}"></td>
+      <td><input data-if="qty" type="text" value="${qty || ''}" class="item-qty" style="text-align:center;"></td>
+      <td><input data-if="price" type="text" value="${price || ''}" class="item-price" style="text-align:center;"></td>
+      <td><input data-if="priceWithTax" type="text" value="${priceWithTax || ''}" class="item-price-with-tax" style="text-align:center;color:var(--orange);font-weight:700;"></td>
+      <td style="color:var(--green);font-weight:700;">${money(taxAmount)}</td>
+      <td><input data-if="totalWithTax" type="text" value="${totalWithTax || ''}" class="item-total" style="font-weight:800;color:var(--navy);text-align:center;"></td>
+      <td><button class="rm" data-rm="${it.id}">×</button></td>
+    </tr>`;
+  }
+
+  function receiptFormPanels(doc) {
+    return `<div class="panel"><h4>بيانات السند</h4>
+    <div class="field"><label>التاريخ</label><input data-f="date" value="${doc.date}"></div>
+    <div class="field"><label>استلمنا من السيد</label><input data-f="receivedFrom" value="${doc.receivedFrom}"></div>
+    <div class="field"><label>مبلغ وقدره (ريال)</label><input data-f="amount" type="number" value="${doc.amount}"></div>
+    <div class="field"><label>وذلك مقابل</label><textarea data-f="amountFor">${doc.amountFor}</textarea></div>
+    <div class="field"><label>طريقة السداد</label><select data-f="paymentMethod">${['تحويل بنكي','نقدي','شيك'].map(o=>`<option ${doc.paymentMethod===o?'selected':''}>${o}</option>`).join('')}</select></div>
+    <div class="field-row"><div class="field"><label>رقم العملية</label><input data-f="txnRef" value="${doc.txnRef}"></div><div class="field"><label>البنك</label><input data-f="bankName" value="${doc.bankName}"></div></div>
+    <div class="field"><label>ملاحظات</label><textarea data-f="notes">${doc.notes}</textarea></div></div>
+  <div class="panel"><h4>التوقيعات</h4>
+    <div class="field"><label>اسم المستلم</label><input data-f="receiverName" value="${doc.receiverName}"></div>
+    <div class="field"><label>تاريخ الاستلام</label><input data-f="receiverDate" value="${doc.receiverDate}"></div>
+    <div class="field"><label>اسم المسلّم</label><input data-f="payerName" value="${doc.payerName}"></div>
+    <div class="field"><label>تاريخ التسليم</label><input data-f="payerDate" value="${doc.payerDate}"></div></div>
+  <div class="actions-bar" style="grid-column:1/-1;">
+    <button class="btn-primary" id="save-doc">💾 حفظ في الأرشيف</button>
+    <button class="btn-pdf" id="download-pdf-form">📥 تحميل PDF</button>
+    <button class="btn-secondary" id="save-print">🖨️ حفظ وطباعة</button>
+    <button class="btn-ghost" id="cancel-form">إلغاء</button></div>`;
+  }
+
+  function computeTotals(doc) {
+    let s = 0,
+      v = 0;
+    const t = TYPES[doc.type];
+    const tax = safeNumber(doc.taxPercent || 15);
+    doc.items.forEach(it => {
+      let totalBeforeTax = 0;
+      if (t.isPrecast) {
+        const qty = safeNumber(it.qty);
+        const unitPriceWithoutTax = safeNumber(it.unitPriceWithoutTax);
+        totalBeforeTax = roundToTwo(qty * unitPriceWithoutTax);
+      } else {
+        const price = safeNumber(it.price);
+        const qty = safeNumber(it.qty);
+        totalBeforeTax = roundToTwo(qty * price);
+      }
+      s += totalBeforeTax;
+      v += roundToTwo(totalBeforeTax * (tax / 100));
+    });
+    return { subtotal: roundToTwo(s), vat: roundToTwo(v), grand: roundToTwo(s + v) };
+  }
+
+  function quotePreview(t, doc) {
+    const tot = computeTotals(doc);
+    const fixedFields = SETTINGS.fixedFields || DEFAULT_SETTINGS.fixedFields;
+    const fixedNotes = doc.notes || SETTINGS.fixedNotes || DEFAULT_SETTINGS.fixedNotes;
+    const showTotal = doc.showTotal !== undefined ? doc.showTotal : true;
+    const totalHiddenClass = showTotal ? '' : 'hidden';
+    const showNumber = doc.showNumber !== undefined ? doc.showNumber : true;
+    const numberDisplay = showNumber ? doc.number : '—';
+    const showBank = doc.showBank !== undefined ? doc.showBank : true;
+    
+    // جلب الملاحظات الثابتة الخاصة بهذا النوع
+    const typeFixedNotes = SETTINGS.typeFixedNotes && SETTINGS.typeFixedNotes[t.key] 
+      ? SETTINGS.typeFixedNotes[t.key] 
+      : '';
+    
+    let qtyLabel = 'الكمية';
+    let priceLabel = 'سعر الوحدة قبل الضريبة';
+    let priceWithTaxLabel = 'سعر الوحدة بعد الضريبة';
+    let sizeLabel = '';
+    
+    if (t.isBlock) {
+      priceLabel = 'سعر الحبة قبل الضريبة';
+      priceWithTaxLabel = 'سعر الحبة بعد الضريبة';
+    }
+    
+    if (t.isConcrete) {
+      qtyLabel = 'الكمية متر مكعب';
+      priceLabel = 'سعر المتر قبل الضريبة';
+      priceWithTaxLabel = 'سعر المتر شامل الضريبة';
+    } else if (t.isPrecast) {
+      qtyLabel = 'الكمية';
+      priceLabel = 'سعر الوحدة قبل الضريبة';
+      sizeLabel = 'المقاس';
+      priceWithTaxLabel = 'سعر الوحدة بعد الضريبة';
+    }
+
+    function infoLineWithGreen(k, v, fieldKey) {
+      const isGreen = fixedFields[fieldKey] === true;
+      const greenClass = isGreen ? 'green-static' : '';
+      return `<div class="info-line"><span class="k">${k}</span><span class="v ${greenClass}">${v&&v.length?v:'—'}</span></div>`;
+    }
+
+    const watermarkHTML = `<div class="watermark"><img src="https://i.ibb.co/LDWsTJhH/Picsart-26-08-08-16-27-38-377.png" alt="علامة مائية"></div>`;
+
+    // تقسيم الملاحظات الثابتة إلى سطور منفصلة
+    const fixedNotesLines = typeFixedNotes ? typeFixedNotes.split('\n').filter(line => line.trim()) : [];
+    const fixedNotesHTML = fixedNotesLines.length > 0 
+      ? `<div class="notes-box" style="padding-bottom:6px;"><b>📝 ملاحظات:</b><br>${fixedNotesLines.map(line => `<span style="display:block;padding:2px 0;">${line}</span>`).join('')}</div>`
+      : '';
+
+    return `<div class="doc-sheet">
+  ${watermarkHTML}
+  <div class="doc-header">
+    <div class="logo-area">
+      <img src="https://i.ibb.co/RkkHh5QP/IMG-20260725-WA0001.jpg" alt="شعار الشركة" class="logo-img">
+    </div>
+    <div class="company-info">
+      <div class="tag">شركة</div>
+      <h1>${SETTINGS.companyLine1}<br><span>${t.badge} — ${SETTINGS.companyLine2}</span></h1>
+      <div class="slogan">${SETTINGS.slogan}</div>
+    </div>
+    <div class="badge-area">
+      <div class="doc-badge">
+        <div class="t">رقم العرض</div>
+        <div class="big">${numberDisplay}</div>
+      </div>
+    </div>
+  </div>
+  <div class="doc-title-strip"><h2>${t.key==='claim'?'مطالبة مالية':'عرض سعر'}</h2><div class="subtitle">${t.title}</div></div>
+  <div class="info-grid">
+    <div class="info-box"><h5>بيانات العميل</h5>
+      ${infoLineWithGreen('تاريخ العرض', doc.date, 'date')}
+      ${infoLineWithGreen('اسم العميل', doc.customerName, 'customerName')}
+      ${infoLineWithGreen('جهة الاتصال', doc.contact, 'contact')}
+      ${infoLineWithGreen('الرقم الضريبي', doc.taxNumberClient, 'taxNumberClient')}
+      ${infoLineWithGreen('طريقة الدفع', doc.paymentMethod, 'paymentMethod')}
+      ${infoLineWithGreen('الموقع', doc.location, 'location')}
+    </div>
+    <div class="info-box"><h5>تفاصيل العرض</h5>
+      ${infoLineWithGreen('المشروع', doc.project, 'project')}
+      ${!t.isPrecast ? infoLineWithGreen(t.itemLabel==='البيان'?'نوع المواد':'نوع '+t.badge, doc.materialType, 'materialType') : ''}
+      ${infoLineWithGreen('الضريبة', (doc.taxPercent||15)+'%', 'taxPercent')}
+      ${infoLineWithGreen('وصف الأعمال', doc.workDescription, 'workDescription')}
+      ${infoLineWithGreen('مقدم العرض', doc.preparedBy, 'preparedBy')}
+      ${infoLineWithGreen('الموقع', doc.location2, 'location2')}
+    </div>
+  </div>
+  <div class="doc-table-wrap">
+    <table class="doc-table">
+      <thead><tr><th>م</th><th>${t.itemLabel}</th>${t.isPrecast ? `<th>${sizeLabel}</th>` : `<th>الوحدة</th>`}<th>${qtyLabel}</th><th>${priceLabel}</th><th>${priceWithTaxLabel}</th><th>الضريبة</th><th>الإجمالي شامل الضريبة</th></tr></thead>
+      <tbody>${doc.items.map((it,i)=>{
+        const tax = safeNumber(doc.taxPercent || 15);
+        let totalBeforeTax = 0;
+        let price = 0;
+        let priceWithTax = 0;
+        let qty = 0;
+        let size = '';
+        
+        if (t.isPrecast) {
+          qty = safeNumber(it.qty);
+          price = safeNumber(it.unitPriceWithoutTax);
+          size = it.size || '—';
+          totalBeforeTax = roundToTwo(qty * price);
+          priceWithTax = safeNumber(it.unitPriceWithTax) || roundToTwo(price * (1 + (tax / 100)));
+        } else {
+          qty = safeNumber(it.qty);
+          price = safeNumber(it.price);
+          totalBeforeTax = roundToTwo(qty * price);
+          priceWithTax = safeNumber(it.priceWithTax) || roundToTwo(price * (1 + (tax / 100)));
+        }
+        const taxAmount = roundToTwo(totalBeforeTax * (tax / 100));
+        const totalWithTax = roundToTwo(totalBeforeTax + taxAmount);
+        
+        return `<tr><td>${i+1}</td><td>${it.desc||'—'}</td>${t.isPrecast ? `<td>${size}</td>` : `<td>${it.unit||'—'}</td>`}<td>${qty||0}</td><td>${money(price)}</td><td style="color:var(--orange);font-weight:700;">${money(priceWithTax)}</td><td>${money(taxAmount)}</td><td>${money(totalWithTax)}</td></tr>`;
+      }).join('')}</tbody>
+    </table>
+  </div>
+  <div class="total-bar ${totalHiddenClass}"><span>الإجمالي شامل الضريبة (${doc.taxPercent||15}%)</span><span class="amt">${money(tot.grand)} ريال</span></div>
+  ${(t.terms&&(doc.priceTerms||doc.deliveryTerms))?`<div class="notes-box" style="margin-top:14px;"><b>شروط التنفيذ</b><ul>${doc.priceTerms?'<li>'+doc.priceTerms+'</li>':''}${doc.deliveryTerms?'<li>'+doc.deliveryTerms+'</li>':''}</ul></div>`:''}
+  ${fixedNotesHTML}
+  ${showBank ? bankBox() : ''}
+  ${fixedNotes ? `<div class="notes-box" style="padding-bottom:6px;">${fixedNotes}</div>` : ''}
+  ${footerBar()}</div>`;
+  }
+
+  function receiptPreview(doc) {
+    const showNumber = doc.showNumber !== undefined ? doc.showNumber : true;
+    const numberDisplay = showNumber ? doc.number : '—';
+    const showBank = doc.showBank !== undefined ? doc.showBank : true;
+    const watermarkHTML = `<div class="watermark"><img src="https://i.ibb.co/LDWsTJhH/Picsart-26-08-08-16-27-38-377.png" alt="علامة مائية"></div>`;
+    return `<div class="doc-sheet">
+  ${watermarkHTML}
+  <div class="doc-header">
+    <div class="logo-area">
+      <img src="https://i.ibb.co/RkkHh5QP/IMG-20260725-WA0001.jpg" alt="شعار الشركة" class="logo-img">
+    </div>
+    <div class="company-info">
+      <div class="tag">شركة</div>
+      <h1>${SETTINGS.companyLine1}<br><span>خرسانة جاهزة</span></h1>
+      <div class="slogan">${SETTINGS.address} — ر.ض ${SETTINGS.taxNumber}</div>
+    </div>
+    <div class="badge-area">
+      <div class="doc-badge">
+        <div class="t">رقم السند</div>
+        <div class="big">${numberDisplay}</div>
+      </div>
+    </div>
+  </div>
+  <div class="doc-title-strip"><h2>سند استلام</h2><div class="subtitle">التاريخ: ${doc.date}</div></div>
+  <div style="padding:0 26px 8px;font-size:14px;"><b>استلمنا من السيد / </b> ${doc.receivedFrom||'—'}</div>
+  <div class="receipt-amount-box"><span style="color:var(--muted);font-size:13px;">مبلغ وقدره</span><span class="v">${money(doc.amount)} ريال سعودي</span></div>
+  <div class="receipt-words">وذلك بالحروف: ${numberToArabicWords(doc.amount)}</div>
+  <div style="padding:0 26px 10px;font-size:14px;"><b>وذلك مقابل: </b>${doc.amountFor||'—'}</div>
+  <div class="info-grid" style="grid-template-columns:1fr 1fr 1fr;">
+    <div class="info-box"><h5>طريقة السداد</h5>${infoLine('الطريقة',doc.paymentMethod)}</div>
+    <div class="info-box"><h5>رقم العملية</h5>${infoLine('الحوالة',doc.txnRef)}</div>
+    <div class="info-box"><h5>البنك</h5>${infoLine('الاسم',doc.bankName)}</div>
+  </div>
+  ${doc.notes?`<div class="notes-box"><b>ملاحظات: </b>${doc.notes}</div>`:''}
+  <div class="sign-grid">
+    <div class="sg"><h5>المستلم</h5><div class="sl"><span>الاسم</span><span>${doc.receiverName||'—'}</span></div><div class="sl"><span>التاريخ</span><span>${doc.receiverDate||'—'}</span></div><div class="sl"><span>التوقيع</span><span>____________</span></div></div>
+    <div class="sg"><h5>المسلّم</h5><div class="sl"><span>الاسم</span><span>${doc.payerName||'—'}</span></div><div class="sl"><span>التاريخ</span><span>${doc.payerDate||'—'}</span></div><div class="sl"><span>التوقيع</span><span>____________</span></div></div>
+  </div>
+  ${showBank ? bankBox() : ''}
+  ${footerBar()}</div>`;
+  }
+
+  function infoLine(k, v) {
+    return `<div class="info-line"><span class="k">${k}</span><span class="v">${v&&v.length?v:'—'}</span></div>`;
+  }
+
+  function bankBox() {
+    const bankLogo = `<img src="https://i.ibb.co/DDx8LMgN/1774895219377-mmurvu75.png" alt="مصرف الراجحي" class="bank-logo-img">`;
+    return `<div class="bank-box">
+      <div class="item">
+        <span class="k">البنك</span>
+        <span class="v">
+          <div class="bank-logo-wrapper">
+            ${bankLogo}
+            <div class="bank-name-wrapper">
+              <span class="bank-name-ar">${SETTINGS.bankName}</span>
+              <span class="bank-name-en">${SETTINGS.bankNameEn || 'alrajhi bank'}</span>
+            </div>
+          </div>
+        </span>
+      </div>
+      <div class="item"><span class="k">رقم الحساب</span><span class="v">${SETTINGS.accountNumber}</span></div>
+      <div class="item"><span class="k">الآيبان</span><span class="v">${SETTINGS.iban}</span></div>
+    </div>`;
+  }
+
+  function footerBar() {
+    return `<div class="doc-footer">
+      <div class="quality">✔ ملتزمون بالجودة</div>
+      <div class="contact-item">✉️ ${SETTINGS.email}</div>
+      <div class="contact-item">🌐 ${SETTINGS.website}</div>
+      <div class="contact-item">📞 ${SETTINGS.phone}</div>
+    </div>`;
+  }
+
+  function bindForm(type, id) {
+    const t = TYPES[type];
+    const doc = window._currentDoc;
+
+    function refreshPreview() {
+      document.getElementById('preview').innerHTML = t.kind === 'quote' ? quotePreview(t, doc) : receiptPreview(doc);
+    }
+
+    // ========== حساب ثنائي الاتجاه محسن ==========
+    function calculateItem(item, taxPercent, triggeredField) {
+      const tax = safeNumber(taxPercent);
+      
+      if (t.isPrecast) {
+        let qty = safeNumber(item.qty);
+        let unitPriceWithoutTax = safeNumber(item.unitPriceWithoutTax);
+        let unitPriceWithTax = safeNumber(item.unitPriceWithTax);
+        let totalWithTax = safeNumber(item.totalWithTax);
+        
+        if (triggeredField === 'qty' || triggeredField === 'unitPriceWithoutTax') {
+          const totalBeforeTax = roundToTwo(qty * unitPriceWithoutTax);
+          const taxAmount = roundToTwo(totalBeforeTax * (tax / 100));
+          totalWithTax = roundToTwo(totalBeforeTax + taxAmount);
+          unitPriceWithTax = roundToTwo(unitPriceWithoutTax * (1 + (tax / 100)));
+        } else if (triggeredField === 'unitPriceWithTax') {
+          if (unitPriceWithTax > 0) {
+            unitPriceWithoutTax = roundToTwo(unitPriceWithTax / (1 + (tax / 100)));
+            const totalBeforeTax = roundToTwo(qty * unitPriceWithoutTax);
+            const taxAmount = roundToTwo(totalBeforeTax * (tax / 100));
+            totalWithTax = roundToTwo(totalBeforeTax + taxAmount);
+          }
+        } else if (triggeredField === 'totalWithTax') {
+          if (totalWithTax > 0 && qty > 0) {
+            const totalBeforeTax = roundToTwo(totalWithTax / (1 + (tax / 100)));
+            unitPriceWithoutTax = roundToTwo(totalBeforeTax / qty);
+            unitPriceWithTax = roundToTwo(unitPriceWithoutTax * (1 + (tax / 100)));
+          }
+        }
+        
+        item.qty = qty;
+        item.unitPriceWithoutTax = unitPriceWithoutTax;
+        item.unitPriceWithTax = unitPriceWithTax;
+        item.totalWithTax = totalWithTax;
+        
+        return { unitPriceWithoutTax, unitPriceWithTax, totalWithTax };
+      } else {
+        let qty = safeNumber(item.qty);
+        let price = safeNumber(item.price);
+        let priceWithTax = safeNumber(item.priceWithTax);
+        let totalWithTax = safeNumber(item.totalWithTax);
+        
+        if (triggeredField === 'qty' || triggeredField === 'price') {
+          const totalBeforeTax = roundToTwo(qty * price);
+          const taxAmount = roundToTwo(totalBeforeTax * (tax / 100));
+          totalWithTax = roundToTwo(totalBeforeTax + taxAmount);
+          priceWithTax = roundToTwo(price * (1 + (tax / 100)));
+        } else if (triggeredField === 'priceWithTax') {
+          if (priceWithTax > 0) {
+            price = roundToTwo(priceWithTax / (1 + (tax / 100)));
+            const totalBeforeTax = roundToTwo(qty * price);
+            const taxAmount = roundToTwo(totalBeforeTax * (tax / 100));
+            totalWithTax = roundToTwo(totalBeforeTax + taxAmount);
+          }
+        } else if (triggeredField === 'totalWithTax') {
+          if (totalWithTax > 0 && qty > 0) {
+            const totalBeforeTax = roundToTwo(totalWithTax / (1 + (tax / 100)));
+            price = roundToTwo(totalBeforeTax / qty);
+            priceWithTax = roundToTwo(price * (1 + (tax / 100)));
+          }
+        }
+        
+        item.qty = qty;
+        item.price = price;
+        item.priceWithTax = priceWithTax;
+        item.totalWithTax = totalWithTax;
+        
+        return { price, priceWithTax, totalWithTax };
+      }
+    }
+
+    // ========== تحديث حقول الصف مع الحفاظ على التركيز ==========
+    function updateRowFields(tr, item) {
+      if (t.isPrecast) {
+        const qtyInput = tr.querySelector('[data-if="qty"]');
+        const priceInput = tr.querySelector('[data-if="unitPriceWithoutTax"]');
+        const priceWithTaxInput = tr.querySelector('[data-if="unitPriceWithTax"]');
+        const totalInput = tr.querySelector('[data-if="totalWithTax"]');
+        const taxCells = tr.querySelectorAll('td');
+        const taxCell = taxCells[6];
+        
+        if (qtyInput && document.activeElement !== qtyInput) qtyInput.value = item.qty || '';
+        if (priceInput && document.activeElement !== priceInput) priceInput.value = item.unitPriceWithoutTax || '';
+        if (priceWithTaxInput && document.activeElement !== priceWithTaxInput) priceWithTaxInput.value = item.unitPriceWithTax || '';
+        if (totalInput && document.activeElement !== totalInput) totalInput.value = item.totalWithTax || '';
+        if (taxCell) {
+          const totalBeforeTax = roundToTwo(item.qty * item.unitPriceWithoutTax);
+          const taxAmount = roundToTwo(totalBeforeTax * (safeNumber(doc.taxPercent) / 100));
+          taxCell.textContent = money(taxAmount);
+        }
+      } else {
+        const qtyInput = tr.querySelector('[data-if="qty"]');
+        const priceInput = tr.querySelector('[data-if="price"]');
+        const priceWithTaxInput = tr.querySelector('[data-if="priceWithTax"]');
+        const totalInput = tr.querySelector('[data-if="totalWithTax"]');
+        const taxCells = tr.querySelectorAll('td');
+        const taxCell = taxCells[6];
+        
+        if (qtyInput && document.activeElement !== qtyInput) qtyInput.value = item.qty || '';
+        if (priceInput && document.activeElement !== priceInput) priceInput.value = item.price || '';
+        if (priceWithTaxInput && document.activeElement !== priceWithTaxInput) priceWithTaxInput.value = item.priceWithTax || '';
+        if (totalInput && document.activeElement !== totalInput) totalInput.value = item.totalWithTax || '';
+        if (taxCell) {
+          const totalBeforeTax = roundToTwo(item.qty * item.price);
+          const taxAmount = roundToTwo(totalBeforeTax * (safeNumber(doc.taxPercent) / 100));
+          taxCell.textContent = money(taxAmount);
+        }
+      }
+    }
+
+    // ========== معالج الإدخال المحسّن ==========
+    document.getElementById('form-panels').addEventListener('input', function(e) {
+      const f = e.target.dataset.f;
+      if (f) {
+        doc[f] = e.target.value;
+        refreshPreview();
+        return;
+      }
+      
+      const ifld = e.target.dataset.if;
+      if (ifld) {
+        const tr = e.target.closest('tr');
+        if (!tr) return;
+        const itemId = tr.dataset.id;
+        const item = doc.items.find(x => x.id === itemId);
+        if (!item) return;
+        
+        let val = e.target.value;
+        
+        if (ifld === 'qty' || ifld === 'price' || ifld === 'priceWithTax' || 
+            ifld === 'totalWithTax' || ifld === 'unitPriceWithoutTax' || 
+            ifld === 'unitPriceWithTax') {
+          if (val === '') {
+            item[ifld] = '';
+          } else {
+            const num = parseFloat(val);
+            if (!isNaN(num) && isFinite(num)) {
+              item[ifld] = num;
+            } else {
+              item[ifld] = val;
+            }
+          }
+        } else {
+          item[ifld] = val;
+        }
+        
+        const taxPercent = safeNumber(doc.taxPercent || 15);
+        const triggeredField = ifld;
+        
+        if (['qty', 'price', 'priceWithTax', 'totalWithTax', 'unitPriceWithoutTax', 'unitPriceWithTax'].includes(ifld)) {
+          const currentVal = item[ifld];
+          if (currentVal !== '' && currentVal !== null && currentVal !== undefined) {
+            const numVal = parseFloat(currentVal);
+            if (!isNaN(numVal) && isFinite(numVal)) {
+              item[ifld] = numVal;
+              calculateItem(item, taxPercent, triggeredField);
+            }
+          }
+        }
+        
+        updateRowFields(tr, item);
+        refreshPreview();
+      }
+    });
+
+    // ========== معالج النقر على الأزرار ==========
+    document.getElementById('form-panels').addEventListener('click', async e => {
+      if (e.target.id === 'add-row') {
+        doc.items.push(emptyItem(t.isPrecast));
+        document.getElementById('items-body').innerHTML = doc.items.map((it, i) => itemRow(it, i, t, doc.taxPercent)).join('');
+        refreshPreview();
+      }
+      const rmId = e.target.dataset.rm;
+      if (rmId) {
+        doc.items = doc.items.filter(x => x.id !== rmId);
+        if (!doc.items.length) doc.items.push(emptyItem(t.isPrecast));
+        document.getElementById('items-body').innerHTML = doc.items.map((it, i) => itemRow(it, i, t, doc.taxPercent)).join('');
+        refreshPreview();
+      }
+      if (e.target.id === 'save-doc') {
+        const success = await persistDoc(doc);
+        if (success) {
+          toast('✅ تم الحفظ');
+          go('#/archive');
+        }
+      }
+      if (e.target.id === 'save-print') {
+        const success = await persistDoc(doc);
+        if (success) {
+          toast('✅ تم الحفظ');
+          setTimeout(() => go('#/view/' + doc.id + '?print=1'), 150);
+        }
+      }
+      if (e.target.id === 'cancel-form') {
+        go('#/dashboard');
+      }
+
+      if (e.target.id === 'download-pdf-form') {
+        refreshPreview();
+        const defaultName = doc.number + ' - ' + (doc.customerName || doc.receivedFrom || 'مستند');
+        const fileName = prompt('أدخل اسم ملف PDF:', defaultName);
+        if (fileName === null) return;
+        const finalName = (fileName.trim() || defaultName).replace(/[\\/:*?"<>|]/g, '-');
+
+        const btn = e.target;
+        const originalText = btn.innerHTML;
+        btn.innerHTML = '⏳ جاري التجهيز...';
+        btn.disabled = true;
+
+        const element = document.querySelector('#preview .doc-sheet');
+        const opt = {
+          margin: [5, 5, 5, 5],
+          filename: finalName + '.pdf',
+          image: { type: 'jpeg', quality: 0.98 },
+          html2canvas: { scale: 3, useCORS: true, letterRendering: true },
+          jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+        };
+
+        html2pdf().set(opt).from(element).save().then(() => {
+          btn.innerHTML = originalText;
+          btn.disabled = false;
+          toast('✅ تم تحميل: ' + finalName + '.pdf');
+        }).catch(err => {
+          console.error(err);
+          btn.innerHTML = originalText;
+          btn.disabled = false;
+          toast('❌ حدث خطأ أثناء إنشاء PDF');
+        });
+      }
+    });
+
+    // ========== أزرار التحكم ==========
+    const toggleBtn = document.getElementById('toggle-total-btn');
+    if (toggleBtn) {
+      toggleBtn.addEventListener('click', async function() {
+        doc.showTotal = !doc.showTotal;
+        await saveDoc(doc);
+        this.textContent = doc.showTotal ? '🔽 إخفاء الإجمالي' : '🔼 إظهار الإجمالي';
+        this.className = doc.showTotal ? 'btn-toggle-total showing' : 'btn-toggle-total';
+        refreshPreview();
+        toast(doc.showTotal ? '✅ تم إظهار الإجمالي' : '✅ تم إخفاء الإجمالي');
+      });
+    }
+
+    const toggleNumBtn = document.getElementById('toggle-number-btn');
+    if (toggleNumBtn) {
+      toggleNumBtn.addEventListener('click', async function() {
+        doc.showNumber = !doc.showNumber;
+        await saveDoc(doc);
+        this.textContent = doc.showNumber ? '🔢 إخفاء رقم العرض' : '🔢 إظهار رقم العرض';
+        this.className = doc.showNumber ? 'btn-toggle-number showing' : 'btn-toggle-number';
+        refreshPreview();
+        toast(doc.showNumber ? '✅ تم إظهار الرقم' : '✅ تم إخفاء الرقم');
+      });
+    }
+
+    const toggleBankBtn = document.getElementById('toggle-bank-btn');
+    if (toggleBankBtn) {
+      toggleBankBtn.addEventListener('click', async function() {
+        doc.showBank = !doc.showBank;
+        await saveDoc(doc);
+        this.textContent = doc.showBank ? '🏦 إخفاء بيانات البنك' : '🏦 إظهار بيانات البنك';
+        this.className = doc.showBank ? 'btn-toggle-number showing' : 'btn-toggle-number';
+        refreshPreview();
+        toast(doc.showBank ? '✅ تم إظهار البنك' : '✅ تم إخفاء البنك');
+      });
+    }
+
+    // ========== تحديث عند تغيير الضريبة ==========
+    document.querySelector('[data-f="taxPercent"]')?.addEventListener('change', function() {
+      doc.taxPercent = safeNumber(this.value);
+      doc.items.forEach(item => {
+        if (t.isPrecast) {
+          calculateItem(item, doc.taxPercent, 'unitPriceWithoutTax');
+        } else {
+          calculateItem(item, doc.taxPercent, 'price');
+        }
+      });
+      document.getElementById('items-body').innerHTML = doc.items.map((it, i) => itemRow(it, i, t, doc.taxPercent)).join('');
+      refreshPreview();
+    });
+  }
+
+  async function persistDoc(doc) {
+    const isNew = !DOCS.find(d => d.id === doc.id);
+    if (isNew) {
+      await commitDocNumber();
+    }
+    return await saveDoc(doc);
+  }
+
+  // ============================= VIEW PAGE =============================
+  function renderViewPage(id) {
+    const doc = DOCS.find(d => d.id === id);
+    if (!doc) return '<p>غير موجود</p>';
+    const hasExecution = !!doc.executionOrder;
+
+    return `<h1 class="page-title">👁️ معاينة المستند</h1>
+      <p class="page-sub">اختر المستند الذي تريد معاينته</p>
+      <div class="actions-bar" style="margin-bottom:18px;">
+        <button class="btn-secondary showing" id="preview-quote-btn">📄 معاينة عرض السعر</button>
+        ${hasExecution ? `<button class="btn-primary" id="preview-execution-btn">📋 معاينة أمر التنفيذ</button>` : ''}
+        <button class="btn-ghost" id="back-archive-main">↩ رجوع للأرشيف</button>
+      </div>
+      <div id="view-mode-area"></div>`;
+  }
+
+  function quoteViewMarkup(doc) {
+    const t = TYPES[doc.type];
+    const html = t.kind === 'quote' ? quotePreview(t, doc) : receiptPreview(doc);
+    const whatsappLink = getWhatsAppLink(doc);
+    const hasContact = doc.contact && doc.contact.replace(/[\s\-\(\)]/g, '').length > 0;
+
+    return `<div class="panel" style="margin-bottom:16px;padding:14px;">
+      <h4 style="margin-bottom:12px;">📄 عرض السعر</h4>
+      <div class="actions-bar" style="margin-top:0;">
+        <button class="btn-pdf" id="do-download-pdf">📥 تحميل PDF</button>
+        <button class="btn-secondary" id="do-print">🖨️ طباعة مباشرة</button>
+        <button class="btn-ghost" id="do-edit">✏️ تعديل</button>
+        <button class="btn-ghost" id="do-duplicate">🧾 نسخ</button>
+        ${hasContact ? `<a href="${whatsappLink}" target="_blank" class="btn-whatsapp">💬 واتساب</a>` : `<span class="btn-whatsapp disabled" style="padding:11px 20px;border-radius:9px;display:inline-flex;align-items:center;gap:6px;background:#ccc;color:#666;cursor:not-allowed;">💬 لا يوجد رقم</span>`}
+      </div>
+    </div>
+    <div id="print-area">${html}</div>`;
+  }
+
+  function executionViewMarkup(doc) {
+    if (!doc.executionOrder) {
+      return `<div class="panel"><div class="empty-state" style="padding:35px 15px;"><div class="em">📋</div>لا يوجد أمر تنفيذ محفوظ لهذا العرض.</div></div>`;
+    }
+    return `<div class="panel" style="margin-bottom:16px;padding:14px;">
+      <h4 style="margin-bottom:12px;">📋 أمر التنفيذ</h4>
+      <div class="actions-bar" style="margin-top:0;">
+        <button class="btn-pdf" id="do-download-execution-pdf">📥 تحميل PDF أمر التنفيذ</button>
+        <button class="btn-secondary" id="do-print-execution">🖨️ طباعة</button>
+        <button class="btn-secondary" id="do-copy-execution">📋 نسخ النص</button>
+        <button class="btn-ghost" id="do-edit-execution">✏️ تعديل أمر التنفيذ</button>
+      </div>
+    </div>
+    <div id="print-area">${executionPreview(doc, doc.executionOrder)}</div>`;
+  }
+
+  function bindViewPage(id) {
+    const doc = DOCS.find(d => d.id === id);
+    if (!doc) return;
+    const area = document.getElementById('view-mode-area');
+    const quoteBtn = document.getElementById('preview-quote-btn');
+    const executionBtn = document.getElementById('preview-execution-btn');
+    const backMain = document.getElementById('back-archive-main');
+
+    if (backMain) backMain.onclick = () => go('#/archive');
+
+    function setModeButtons(mode) {
+      if (quoteBtn) {
+        quoteBtn.className = mode === 'quote' ? 'btn-secondary showing' : 'btn-secondary';
+        quoteBtn.style.outline = mode === 'quote' ? '3px solid rgba(249,115,22,.25)' : 'none';
+      }
+      if (executionBtn) {
+        executionBtn.className = mode === 'execution' ? 'btn-primary' : 'btn-primary';
+        executionBtn.style.outline = mode === 'execution' ? '3px solid rgba(249,115,22,.25)' : 'none';
+      }
+    }
+
+    function bindQuoteActions() {
+      document.getElementById('do-download-pdf')?.addEventListener('click', () => {
+        const defaultName = doc.number + ' - ' + (doc.customerName || doc.receivedFrom || 'مستند');
+        const fileName = prompt('أدخل اسم ملف PDF:', defaultName);
+        if (fileName === null) return;
+        const finalName = (fileName.trim() || defaultName).replace(/[\\/:*?"<>|]/g, '-');
+        const btn = document.getElementById('do-download-pdf');
+        const orig = btn.innerHTML;
+        btn.innerHTML = '⏳ جاري التجهيز...';
+        btn.disabled = true;
+        const element = document.querySelector('#print-area .doc-sheet');
+        const opt = {
+          margin: [5, 5, 5, 5],
+          filename: finalName + '.pdf',
+          image: { type: 'jpeg', quality: 0.98 },
+          html2canvas: { scale: 3, useCORS: true, letterRendering: true, backgroundColor: '#ffffff' },
+          jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+        };
+        html2pdf().set(opt).from(element).save().then(() => {
+          btn.innerHTML = orig;
+          btn.disabled = false;
+          toast('✅ تم تحميل: ' + finalName + '.pdf');
+        }).catch(err => {
+          console.error(err);
+          btn.innerHTML = orig;
+          btn.disabled = false;
+          toast('❌ خطأ أثناء إنشاء PDF');
+        });
+      });
+
+      document.getElementById('do-print')?.addEventListener('click', () => window.print());
+      document.getElementById('do-edit')?.addEventListener('click', () => go('#/form/' + doc.type + '/' + doc.id));
+      document.getElementById('do-duplicate')?.addEventListener('click', async () => {
+        const c = JSON.parse(JSON.stringify(doc));
+        c.id = uid();
+        c.number = nextDocNumber();
+        c.date = todayStr();
+        c.status = 'pending';
+        delete c.executionOrder;
+        await commitDocNumber();
+        await saveDoc(c);
+        toast('✅ نسخة جديدة: ' + c.number);
+        go('#/form/' + c.type + '/' + c.id);
+      });
+    }
+
+    function bindExecutionActions() {
+      document.getElementById('do-download-execution-pdf')?.addEventListener('click', () => {
+        if (!doc.executionOrder) { toast('❌ لا يوجد أمر تنفيذ محفوظ'); return; }
+
+        const defaultName = 'أمر تنفيذ - ' + doc.number + ' - ' + (doc.customerName || 'عميل');
+        const fileName = prompt('أدخل اسم ملف PDF:', defaultName);
+        if (fileName === null) return;
+        const finalName = (fileName.trim() || defaultName).replace(/[\\/:*?"<>|]/g, '-');
+
+        const btn = document.getElementById('do-download-execution-pdf');
+        const orig = btn.innerHTML;
+        btn.innerHTML = '⏳ جاري التجهيز...';
+        btn.disabled = true;
+
+        // نفس طريقة تحميل عرض السعر بالضبط
+        const element = document.querySelector('#print-area .doc-sheet');
+        if (!element) {
+          btn.innerHTML = orig;
+          btn.disabled = false;
+          toast('❌ لم يتم العثور على معاينة أمر التنفيذ');
+          return;
+        }
+
+        const opt = {
+          margin: [5, 5, 5, 5],
+          filename: finalName + '.pdf',
+          image: { type: 'jpeg', quality: 0.98 },
+          html2canvas: {
+            scale: 3,
+            useCORS: true,
+            letterRendering: true,
+            backgroundColor: '#ffffff'
+          },
+          jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+        };
+
+        html2pdf().set(opt).from(element).save().then(() => {
+          btn.innerHTML = orig;
+          btn.disabled = false;
+          toast('✅ تم تحميل: ' + finalName + '.pdf');
+        }).catch(err => {
+          console.error(err);
+          btn.innerHTML = orig;
+          btn.disabled = false;
+          toast('❌ خطأ أثناء إنشاء PDF');
+        });
+      });
+      document.getElementById('do-print-execution')?.addEventListener('click', () => window.print());
+      document.getElementById('do-copy-execution')?.addEventListener('click', async () => {
+        if (!doc.executionOrder) return;
+        const text = executionText(doc, doc.executionOrder);
+        try {
+          await navigator.clipboard.writeText(text);
+          toast('✅ تم نسخ نص أمر التنفيذ');
+        } catch (_) {
+          const ta = document.createElement('textarea');
+          ta.value = text;
+          ta.style.position = 'fixed';
+          ta.style.opacity = '0';
+          document.body.appendChild(ta);
+          ta.select();
+          document.execCommand('copy');
+          ta.remove();
+          toast('✅ تم نسخ نص أمر التنفيذ');
+        }
+      });
+      document.getElementById('do-edit-execution')?.addEventListener('click', () => go('#/execution/' + doc.id));
+    }
+
+    function showQuote() {
+      setModeButtons('quote');
+      area.innerHTML = quoteViewMarkup(doc);
+      bindQuoteActions();
+    }
+
+    function showExecution() {
+      setModeButtons('execution');
+      area.innerHTML = executionViewMarkup(doc);
+      bindExecutionActions();
+    }
+
+    quoteBtn?.addEventListener('click', showQuote);
+    executionBtn?.addEventListener('click', showExecution);
+
+    showQuote();
+    if (location.hash.includes('print=1')) setTimeout(() => window.print(), 300);
+  }
+
+  // ============================= EXECUTION ORDER =============================
+  function buildExecutionDetails(doc) {
+    const t = TYPES[doc.type];
+    const items = Array.isArray(doc.items) ? doc.items : [];
+    const parts = items.map(it => {
+      const qty = safeNumber(it.qty);
+      const desc = (it.desc || doc.materialType || '').trim();
+      const unit = (it.unit || '').trim();
+      const qtyText = qty ? (t && t.isConcrete ? qty + ' متر' : qty + (unit ? ' ' + unit : '')) : '';
+      return [qtyText, desc].filter(Boolean).join(' ');
+    }).filter(Boolean);
+    return parts.join(' + ') || doc.materialType || doc.workDescription || '';
+  }
+
+  function executionText(doc, exec) {
+    return `📋 أمر تنفيذ طلب\n\n👤 اسم العميل: ${doc.customerName || ''}\n📞 رقم هاتف المسؤول: ${doc.contact || ''}\n📦 تفاصيل الطلب: ${exec.details || ''}\n🏗️ المضخة: ${exec.pump || ''}\n📍 عنوان التسليم: ${exec.deliveryAddress || ''}\n🕒 موعد التسليم: ${exec.deliveryTime || ''}\n📝 ملاحظات: ${exec.executionNotes || ''}\n👷 مسؤول المتابعة: ${exec.followupPerson || ''}`;
+  }
+
+  function executionPreview(doc, exec) {
+    const watermarkHTML = `<div class="watermark"><img src="https://i.ibb.co/LDWsTJhH/Picsart-26-08-08-16-27-38-377.png" alt="علامة مائية"></div>`;
+    return `<div class="exec-sheet doc-sheet">
+      ${watermarkHTML}
+      <div class="doc-header">
+        <div class="logo-area"><img src="https://i.ibb.co/RkkHh5QP/IMG-20260725-WA0001.jpg" alt="شعار الشركة" class="logo-img"></div>
+        <div class="company-info"><div class="tag">شركة</div><h1>${SETTINGS.companyLine1}<br><span>أمر تنفيذ طلب</span></h1><div class="slogan">${SETTINGS.slogan}</div></div>
+        <div class="badge-area"><div class="doc-badge"><div class="t">مرجع العرض</div><div class="big">${doc.number || '—'}</div></div></div>
+      </div>
+      <div class="doc-title-strip"><h2>أمر تنفيذ طلب</h2><div class="subtitle">تم إنشاؤه من عرض سعر معتمد</div></div>
+      <div class="exec-body">
+        <div class="exec-row"><div class="k">👤 اسم العميل</div><div class="v">${doc.customerName || '—'}</div></div>
+        <div class="exec-row"><div class="k">📞 رقم هاتف المسؤول</div><div class="v">${doc.contact || '—'}</div></div>
+        <div class="exec-row"><div class="k">📦 تفاصيل الطلب</div><div class="v">${exec.details || '—'}</div></div>
+        <div class="exec-row"><div class="k">🏗️ المضخة</div><div class="v">${exec.pump || '—'}</div></div>
+        <div class="exec-row"><div class="k">📍 عنوان التسليم</div><div class="v">${exec.deliveryAddress || '—'}</div></div>
+        <div class="exec-row"><div class="k">🕒 موعد التسليم</div><div class="v">${exec.deliveryTime || '—'}</div></div>
+        <div class="exec-row"><div class="k">📝 ملاحظات</div><div class="v">${exec.executionNotes || '—'}</div></div>
+        <div class="exec-row"><div class="k">👷 مسؤول المتابعة</div><div class="v">${exec.followupPerson || '—'}</div></div>
+      </div>
+      ${footerBar()}
+    </div>`;
+  }
+
+  function renderExecutionPage(id) {
+    const doc = DOCS.find(d => d.id === id);
+    if (!doc) return '<p>المستند غير موجود</p>';
+    if (!TYPES[doc.type] || TYPES[doc.type].kind !== 'quote' || doc.status !== 'approved') {
+      return `<h1 class="page-title">📋 أمر تنفيذ</h1><div class="panel">لا يمكن إنشاء أمر تنفيذ إلا لعرض سعر حالته <b>تمت الموافقة</b>.</div><div class="actions-bar"><button class="btn-ghost" id="back-archive">↩ رجوع</button></div>`;
+    }
+    const exec = {
+      details: buildExecutionDetails(doc),
+      pump: doc.executionOrder?.pump || '',
+      deliveryAddress: doc.executionOrder?.deliveryAddress || doc.location2 || doc.location || '',
+      deliveryTime: doc.executionOrder?.deliveryTime || '',
+      executionNotes: doc.executionOrder?.executionNotes || '',
+      followupPerson: doc.executionOrder?.followupPerson || ''
+    };
+    window._executionOrder = exec;
+    return `<h1 class="page-title">📋 أمر تنفيذ طلب</h1><p class="page-sub">مرجع عرض السعر: <b style="color:var(--orange)">${doc.number}</b></p>
+      <div class="form-wrap">
+        <div>
+          <div class="panel"><h4>بيانات أمر التنفيذ</h4>
+            <div class="field"><label>اسم العميل</label><input value="${doc.customerName || ''}" disabled></div>
+            <div class="field"><label>رقم هاتف المسؤول</label><input value="${doc.contact || ''}" disabled></div>
+            <div class="field"><label>تفاصيل الطلب</label><textarea data-exec="details">${exec.details}</textarea></div>
+            <div class="field"><label>المضخة</label><select data-exec="pump"><option value="">اختر</option><option value="نعم" ${exec.pump==='نعم'?'selected':''}>نعم</option><option value="لا" ${exec.pump==='لا'?'selected':''}>لا</option></select></div>
+            <div class="field"><label>عنوان التسليم</label><input data-exec="deliveryAddress" value="${exec.deliveryAddress}"></div>
+            <div class="field"><label>موعد التسليم</label><input data-exec="deliveryTime" value="${exec.deliveryTime}" placeholder="مثال: غداً الساعة 3 الفجر"></div>
+            <div class="field"><label>ملاحظات</label><textarea data-exec="executionNotes">${exec.executionNotes}</textarea></div>
+            <div class="field"><label>مسؤول المتابعة</label><input data-exec="followupPerson" value="${exec.followupPerson}"></div>
+          </div>
+          <div class="exec-card" style="margin-top:16px;"><h4 style="margin-top:0;color:var(--navy);">📝 النص الجاهز</h4><textarea id="execution-text" class="exec-text" readonly>${executionText(doc, exec)}</textarea></div>
+          <div class="actions-bar">
+            <button class="btn-primary" id="save-execution">💾 حفظ أمر التنفيذ</button>
+            <button class="btn-secondary" id="copy-execution">📋 نسخ النص</button>
+            <button class="btn-ghost" id="back-archive">↩ رجوع</button>
+          </div>
+        </div>
+        <div><div class="panel" style="padding:14px;"><h4>معاينة أمر التنفيذ</h4><div id="execution-preview">${executionPreview(doc, exec)}</div></div></div>
+      </div>`;
+  }
+
+  function bindExecutionPage(id) {
+    const doc = DOCS.find(d => d.id === id);
+    const back = document.getElementById('back-archive');
+    if (back) back.onclick = () => go('#/archive');
+    if (!doc || doc.status !== 'approved' || !window._executionOrder) return;
+    const exec = window._executionOrder;
+    const refresh = () => {
+      const txt = document.getElementById('execution-text');
+      const prev = document.getElementById('execution-preview');
+      if (txt) txt.value = executionText(doc, exec);
+      if (prev) prev.innerHTML = executionPreview(doc, exec);
+    };
+    document.querySelectorAll('[data-exec]').forEach(el => {
+      const evt = el.tagName === 'SELECT' ? 'change' : 'input';
+      el.addEventListener(evt, () => { exec[el.dataset.exec] = el.value; refresh(); });
+    });
+    document.getElementById('save-execution')?.addEventListener('click', async () => {
+      doc.executionOrder = { ...exec, updatedAt: Date.now() };
+      const ok = await saveDoc(doc);
+      if (ok) {
+        toast('✅ تم حفظ أمر التنفيذ');
+        setTimeout(() => go('#/view/' + doc.id), 120);
+      }
+    });
+    document.getElementById('copy-execution')?.addEventListener('click', async () => {
+      const text = executionText(doc, exec);
+      try { await navigator.clipboard.writeText(text); toast('✅ تم نسخ النص'); }
+      catch { const ta=document.getElementById('execution-text'); ta.select(); document.execCommand('copy'); toast('✅ تم نسخ النص'); }
+    });
+  }
+
+  function executionPdfMarkup(doc, exec) {
+    const company = SETTINGS.companyLine1 || '\u0635\u0631\u0648\u062d \u0627\u0644\u062b\u0628\u0627\u062a';
+    const slogan = SETTINGS.slogan || '';
+    const phone = SETTINGS.phone || '';
+    const email = SETTINGS.email || '';
+    const website = SETTINGS.website || '';
+    const rows = [
+      ['\ud83d\udc64 \u0627\u0633\u0645 \u0627\u0644\u0639\u0645\u064a\u0644', doc.customerName || '\u2014'],
+      ['\ud83d\udcde \u0631\u0642\u0645 \u0647\u0627\u062a\u0641 \u0627\u0644\u0645\u0633\u0624\u0648\u0644', doc.contact || '\u2014'],
+      ['\ud83d\udce6 \u062a\u0641\u0627\u0635\u064a\u0644 \u0627\u0644\u0637\u0644\u0628', exec.details || '\u2014'],
+      ['\ud83c\udfd7\ufe0f \u0627\u0644\u0645\u0636\u062e\u0629', exec.pump || '\u2014'],
+      ['\ud83d\udccd \u0639\u0646\u0648\u0627\u0646 \u0627\u0644\u062a\u0633\u0644\u064a\u0645', exec.deliveryAddress || '\u2014'],
+      ['\ud83d\udd52 \u0645\u0648\u0639\u062f \u0627\u0644\u062a\u0633\u0644\u064a\u0645', exec.deliveryTime || '\u2014'],
+      ['\ud83d\udcdd \u0645\u0644\u0627\u062d\u0638\u0627\u062a', exec.executionNotes || '\u2014'],
+      ['\ud83d\udc77 \u0645\u0633\u0624\u0648\u0644 \u0627\u0644\u0645\u062a\u0627\u0628\u0639\u0629', exec.followupPerson || '\u2014']
+    ];
+    const esc = v => String(v ?? '').replace(/[&<>\"]/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;'}[ch] || ch));
+    const rowHtml = rows.map(r => `<div style="display:grid;grid-template-columns:210px 1fr;gap:16px;padding:15px 0;border-bottom:1px dashed #d7dce5;align-items:start;"><div style="font-weight:700;color:#6b7280;font-size:17px;">${esc(r[0])}</div><div style="font-weight:800;color:#111827;font-size:18px;line-height:1.7;overflow-wrap:anywhere;">${esc(r[1])}</div></div>`).join('');
+    return `<div id="execution-pdf-page" dir="rtl" style="width:794px;height:1123px;box-sizing:border-box;background:#fff;color:#111827;font-family:Tajawal,Arial,sans-serif;position:relative;overflow:hidden;display:flex;flex-direction:column;">
+      <div style="height:150px;padding:24px 34px;box-sizing:border-box;border-bottom:3px solid #f97316;display:grid;grid-template-columns:190px 1fr 190px;align-items:center;gap:18px;background:#fff;">
+        <div style="background:#0B1F4D;border:2px solid #F97316;border-radius:14px;padding:14px 12px;text-align:center;color:#fff;"><div style="font-size:13px;opacity:.8;">\u0645\u0631\u062c\u0639 \u0627\u0644\u0639\u0631\u0636</div><div style="font-size:24px;font-weight:900;color:#F97316;margin-top:4px;">${esc(doc.number || '\u2014')}</div></div>
+        <div style="text-align:center;"><div style="font-size:14px;color:#F97316;font-weight:800;">\u0634\u0631\u0643\u0629</div><div style="font-size:31px;color:#0B1F4D;font-weight:900;line-height:1.2;">${esc(company)}</div><div style="font-size:18px;color:#F97316;font-weight:800;margin-top:4px;">\u0623\u0645\u0631 \u062a\u0646\u0641\u064a\u0630 \u0637\u0644\u0628</div><div style="font-size:13px;color:#7A8296;margin-top:4px;">${esc(slogan)}</div></div>
+        <div style="text-align:center;border:2px solid #0B1F4D;border-radius:50%;width:105px;height:105px;margin:auto;display:flex;align-items:center;justify-content:center;color:#0B1F4D;font-weight:900;font-size:18px;line-height:1.25;">\u0635\u0631\u0648\u062d<br>\u0627\u0644\u062b\u0628\u0627\u062a</div>
+      </div>
+      <div style="padding:22px 36px 10px;position:relative;z-index:2;"><div style="font-size:30px;font-weight:900;color:#0B1F4D;border-bottom:4px solid #F97316;display:inline-block;padding-bottom:5px;">\u0623\u0645\u0631 \u062a\u0646\u0641\u064a\u0630 \u0637\u0644\u0628</div><div style="font-size:14px;color:#7A8296;margin-top:7px;">\u062a\u0645 \u0625\u0646\u0634\u0627\u0624\u0647 \u0645\u0646 \u0639\u0631\u0636 \u0633\u0639\u0631 \u0645\u0639\u062a\u0645\u062f</div></div>
+      <div style="position:absolute;left:50%;top:55%;transform:translate(-50%,-50%) rotate(-12deg);font-size:82px;font-weight:900;color:rgba(11,31,77,.055);white-space:nowrap;z-index:1;">\u0635\u0631\u0648\u062d \u0627\u0644\u062b\u0628\u0627\u062a</div>
+      <div style="padding:8px 42px 24px;position:relative;z-index:2;flex:1;">${rowHtml}</div>
+      <div style="height:92px;background:#0B1F4D;color:#fff;padding:16px 28px;box-sizing:border-box;display:grid;grid-template-columns:1.15fr 1fr 1fr;align-items:center;gap:14px;position:relative;z-index:3;">
+        <div style="background:#F97316;color:#fff;border-radius:10px;padding:10px 14px;text-align:center;font-weight:900;font-size:18px;">\u2714 \u0645\u0644\u062a\u0632\u0645\u0648\u0646 \u0628\u0627\u0644\u062c\u0648\u062f\u0629</div>
+        <div style="text-align:center;font-size:13px;line-height:1.7;">${esc(email)}<br>${esc(website)}</div>
+        <div style="text-align:left;font-size:16px;font-weight:800;direction:ltr;">${esc(phone)}</div>
+      </div>
+    </div>`;
+  }
+
+  async function downloadExecutionPdf(doc, exec, btn) {
+    const originalText = btn ? btn.innerHTML : '';
+    let holder = null;
+    try {
+      if (btn) { btn.disabled = true; btn.innerHTML = '\u23f3 \u062c\u0627\u0631\u064a \u062a\u062c\u0647\u064a\u0632 PDF...'; }
+      if (typeof html2pdf !== 'function') throw new Error('html2pdf library is not available');
+
+      holder = document.createElement('div');
+      holder.id = 'execution-pdf-holder';
+      holder.style.position = 'fixed';
+      holder.style.top = '0';
+      holder.style.left = '0';
+      holder.style.width = '794px';
+      holder.style.height = '1123px';
+      holder.style.zIndex = '2147483646';
+      holder.style.background = '#ffffff';
+      holder.style.pointerEvents = 'none';
+      holder.style.overflow = 'hidden';
+      holder.innerHTML = executionPdfMarkup(doc, exec);
+      document.body.appendChild(holder);
+
+      if (document.fonts && document.fonts.ready) {
+        try { await document.fonts.ready; } catch (_) {}
+      }
+      await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+
+      const element = holder.querySelector('#execution-pdf-page');
+      if (!element) throw new Error('Execution PDF page not found');
+
+      const fileName = (`\u0623\u0645\u0631 \u062a\u0646\u0641\u064a\u0630 - ${doc.number || ''} - ${doc.customerName || '\u0639\u0645\u064a\u0644'}`).replace(/[\\/:*?\"<>|]/g, '-');
+      const opt = {
+        margin: 0,
+        filename: fileName + '.pdf',
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: {
+          scale: 1.5,
+          useCORS: false,
+          allowTaint: false,
+          backgroundColor: '#ffffff',
+          logging: false,
+          scrollX: 0,
+          scrollY: 0,
+          width: 794,
+          height: 1123,
+          windowWidth: 794,
+          windowHeight: 1123
+        },
+        jsPDF: { unit: 'px', format: [794, 1123], orientation: 'portrait', compress: true }
+      };
+
+      await html2pdf().set(opt).from(element).save();
+      toast('\u2705 \u062a\u0645 \u062a\u062d\u0645\u064a\u0644 PDF \u0623\u0645\u0631 \u0627\u0644\u062a\u0646\u0641\u064a\u0630');
+    } catch (err) {
+      console.error('Execution PDF error:', err);
+      toast('\u274c \u062d\u062f\u062b \u062e\u0637\u0623 \u0623\u062b\u0646\u0627\u0621 \u0625\u0646\u0634\u0627\u0621 PDF \u0623\u0645\u0631 \u0627\u0644\u062a\u0646\u0641\u064a\u0630');
+    } finally {
+      if (holder && holder.parentNode) holder.parentNode.removeChild(holder);
+      if (btn) { btn.disabled = false; btn.innerHTML = originalText; }
+    }
+  }
+
+  // ============================= ARCHIVE =============================
+  function renderArchive() {
+    if (!DOCS.length) return `<h1 class="page-title">الأرشيف</h1><p class="page-sub">المستندات المحفوظة</p><div class="empty-state"><div class="em">🗂️</div>لا توجد مستندات محفوظة.</div>`;
+    return `<h1 class="page-title">الأرشيف</h1><p class="page-sub">${DOCS.length} مستند</p>
+  <div class="archive-toolbar"><input id="search" placeholder="ابحث بالاسم، الرقم..."><select id="filter-type"><option value="">كل الأنواع</option>${Object.values(TYPES).map(t=>`<option value="${t.key}">${t.title}</option>`).join('')}</select></div>
+  <table class="archive-table"><thead><tr><th>الرقم</th><th>النوع</th><th>العميل</th><th>التاريخ</th><th>الحالة</th><th>الإجمالي</th><th></th></tr></thead><tbody id="archive-body">${archiveRows(DOCS)}</tbody></table>`;
+  }
+
+  function archiveRows(list) {
+    return list.map(d => {
+      const t = TYPES[d.type];
+      if (!t) return '';
+      const name = t.kind === 'quote' ? (d.customerName || '—') : (d.receivedFrom || '—'),
+        total = t.kind === 'quote' ? money(computeTotals(d).grand) : money(d.amount);
+      const whatsappLink = getWhatsAppLink(d);
+      const hasContact = d.contact && d.contact.replace(/[\s\-\(\)]/g, '').length > 0;
+      return `<tr><td><b>${d.number}</b></td><td>${t.title}</td><td>${name}</td><td>${d.date}</td><td>${statusPill(d)}</td><td>${total} ريال</td><td class="row-actions">
+        <button data-view="${d.id}">👁️</button>
+        <button data-edit="${d.id}" data-type="${d.type}">✏️</button>
+        <button data-del="${d.id}">🗑️</button>
+        ${hasContact ? `<a href="${whatsappLink}" target="_blank" class="btn-whatsapp-small" title="إرسال عبر واتساب">💬</a>` : `<span class="btn-whatsapp-small disabled" title="لا يوجد رقم">💬</span>`}
+        ${t.kind === 'quote' && d.status === 'approved' ? `<button class="btn-exec" data-exec-order="${d.id}" title="إنشاء أمر تنفيذ">📋 أمر تنفيذ</button>` : ''}
+      </td></tr>`;
+    }).join('');
+  }
+
+  function statusPill(d) {
+    if (TYPES[d.type].kind !== 'quote') return '<span class="pill approved">مكتمل</span>';
+    const m = { pending: ['قيد الانتظار', 'pending'], approved: ['تمت الموافقة', 'approved'], rejected: ['مرفوض',
+        'rejected'
+      ] };
+    const [l, c] = m[d.status || 'pending'];
+    return `<select class="pill ${c}" data-status="${d.id}" style="border:none;background:transparent;font-weight:700;">${Object.entries(m).map(([k,v])=>`<option value="${k}" ${d.status===k?'selected':''}>${v[0]}</option>`).join('')}</select>`;
+  }
+
+  function bindArchive() {
+    document.getElementById('search').addEventListener('input', filterArchive);
+    document.getElementById('filter-type').addEventListener('change', filterArchive);
+
+    function filterArchive() {
+      const q = document.getElementById('search').value.trim().toLowerCase(),
+        ty = document.getElementById('filter-type').value;
+      const f = DOCS.filter(d => {
+        const t = TYPES[d.type];
+        if (!t) return false;
+        const n = t.kind === 'quote' ? (d.customerName || '') : (d.receivedFrom || '');
+        return (!q || d.number.toLowerCase().includes(q) || n.toLowerCase().includes(q) || t.title.toLowerCase()
+          .includes(q)) && (!ty || d.type === ty);
+      });
+      document.getElementById('archive-body').innerHTML = archiveRows(f);
+      bindArchiveRowActions();
+    }
+    bindArchiveRowActions();
+  }
+
+  function bindArchiveRowActions() {
+    document.querySelectorAll('[data-view]').forEach(b => b.onclick = () => go('#/view/' + b.dataset.view));
+    document.querySelectorAll('[data-edit]').forEach(b => b.onclick = () => go('#/form/' + b.dataset.type + '/' + b.dataset.edit));
+    document.querySelectorAll('[data-exec-order]').forEach(b => b.onclick = () => go('#/execution/' + b.dataset.execOrder));
+    document.querySelectorAll('[data-del]').forEach(b => b.onclick = async () => {
+      if (confirm('تأكيد الحذف؟')) {
+        const success = await deleteDoc(b.dataset.del);
+        if (success) {
+          toast('🗑️ تم الحذف');
+        }
+      }
+    });
+    document.querySelectorAll('[data-status]').forEach(s => s.onchange = async e => {
+      const d = DOCS.find(x => x.id === s.dataset.status);
+      if (d) {
+        d.status = e.target.value;
+        await saveDoc(d);
+        toast('تم التحديث');
+        setTimeout(() => { if (location.hash.includes('/archive')) render(); }, 50);
+      }
+    });
+  }
+
+  // ============================= SETTINGS =============================
+  function renderSettings() {
+    const s = SETTINGS;
+    const fixedFields = s.fixedFields || DEFAULT_SETTINGS.fixedFields;
+    const fixedVals = s.fixedValues || DEFAULT_SETTINGS.fixedValues;
+    const fixedNotes = s.fixedNotes || DEFAULT_SETTINGS.fixedNotes;
+    const showTotal = s.showTotal !== undefined ? s.showTotal : true;
+    const typeFixedNotes = s.typeFixedNotes || {};
+
+    function fixedCheckbox(fieldKey, label) {
+      const checked = fixedFields[fieldKey] === true ? 'checked' : '';
+      return `<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
+        <input type="checkbox" id="ff-${fieldKey}" ${checked}>
+        <label for="ff-${fieldKey}" style="font-size:13px;font-weight:500;color:var(--text);">${label}</label>
+        <span style="font-size:11px;color:var(--green);margin-right:auto;">${checked?'🟢 ثابت':'⚪ غير ثابت'}</span>
+      </div>`;
+    }
+
+    function fixedValueField(fieldKey, label, type = 'text') {
+      const val = fixedVals[fieldKey] || '';
+      return `<div class="field"><label style="color:var(--green);">${label}</label>
+        <input id="fv-${fieldKey}" type="${type}" value="${val}" placeholder="أدخل القيمة الثابتة..."></div>`;
+    }
+
+    // إنشاء حقول الملاحظات الثابتة لكل نوع
+    let typeNotesHTML = '';
+    Object.keys(TYPES).forEach(key => {
+      const t = TYPES[key];
+      if (t.kind === 'quote') {
+        const noteValue = typeFixedNotes[key] || '';
+        typeNotesHTML += `
+          <div style="margin-bottom:10px;border:1px solid var(--border);border-radius:8px;padding:10px;">
+            <label style="font-weight:700;font-size:13px;color:var(--navy);">${t.icon} ${t.title}</label>
+            <textarea id="type-note-${key}" rows="2" style="width:100%;margin-top:5px;padding:8px;border:1px solid var(--border);border-radius:6px;font-size:13px;background:#fbfcfe;color:var(--text);">${noteValue}</textarea>
+          </div>
+        `;
+      }
+    });
+
+    return `<h1 class="page-title">⚙️ الإعدادات</h1><p class="page-sub">تحكم في جميع بيانات الشركة واختر الحقول الثابتة التي تظهر باللون الأخضر</p>
+  <div class="settings-grid">
+    <div class="panel"><h4>🏢 بيانات الشركة</h4>
+      <div class="field"><label>اسم الشركة (سطر 1)</label><input id="s-companyLine1" value="${s.companyLine1}"></div>
+      <div class="field"><label>اسم الشركة (سطر 2)</label><input id="s-companyLine2" value="${s.companyLine2}"></div>
+      <div class="field"><label>الشعار</label><input id="s-slogan" value="${s.slogan}"></div>
+      <div class="field"><label>الرقم الضريبي</label><input id="s-taxNumber" value="${s.taxNumber}"></div>
+      <div class="field"><label>العنوان</label><input id="s-address" value="${s.address}"></div>
+    </div>
+    <div class="panel"><h4>📞 التواصل</h4>
+      <div class="field"><label>الهاتف</label><input id="s-phone" value="${s.phone}"></div>
+      <div class="field"><label>البريد</label><input id="s-email" value="${s.email}"></div>
+      <div class="field"><label>الموقع</label><input id="s-website" value="${s.website}"></div>
+      <div class="field"><label>رقم واتساب</label><input id="s-whatsapp" value="${s.whatsappNumber || '966508346559'}" placeholder="مثال: 966508346559"></div>
+    </div>
+    <div class="panel"><h4>🏦 البنك</h4>
+      <div class="field"><label>اسم البنك (عربي)</label><input id="s-bankName" value="${s.bankName}"></div>
+      <div class="field"><label>اسم البنك (إنجليزي)</label><input id="s-bankNameEn" value="${s.bankNameEn || 'alrajhi bank'}"></div>
+      <div class="field"><label>رقم الحساب</label><input id="s-accountNumber" value="${s.accountNumber}"></div>
+      <div class="field"><label>الآيبان</label><input id="s-iban" value="${s.iban}"></div>
+    </div>
+    <div class="panel"><h4>🔢 الترقيم</h4>
+      <div class="field"><label>السنة</label><input id="s-year" value="${s.year}"></div>
+      <div class="field"><label>الرقم التالي</label><input id="s-nextNumber" type="number" value="${s.nextNumber}"></div>
+    </div>
+    <div class="panel" style="grid-column:1/-1;"><h4>📝 الملاحظات الثابتة العامة</h4>
+      <div class="field"><label>نص الملاحظة الثابتة (تظهر في جميع العروض)</label>
+        <textarea id="s-fixedNotes" rows="3" style="width:100%;padding:9px 11px;border:1px solid var(--border);border-radius:8px;font-size:14px;background:#fbfcfe;color:var(--text);">${fixedNotes}</textarea>
+      </div>
+    </div>
+    <div class="panel" style="grid-column:1/-1;"><h4>📝 ملاحظات ثابتة خاصة بكل نوع عرض</h4>
+      <p style="font-size:13px;color:var(--muted);margin-bottom:12px;">كل نوع عرض له ملاحظاته الثابتة المستقلة التي تظهر تحت شروط التنفيذ</p>
+      ${typeNotesHTML}
+    </div>
+    <div class="panel" style="grid-column:1/-1;"><h4>🟢 الحقول الثابتة</h4>
+      <p style="font-size:13px;color:var(--muted);margin-bottom:12px;">حدد الحقول التي تريد أن تكون ثابتة واملأ قيمها</p>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:16px;">
+        ${fixedCheckbox('location', 'الموقع')}
+        ${fixedCheckbox('taxNumberClient', 'الرقم الضريبي للعميل')}
+        ${fixedCheckbox('paymentMethod', 'طريقة الدفع')}
+        ${fixedCheckbox('project', 'المشروع')}
+        ${fixedCheckbox('materialType', 'نوع الخرسانة')}
+        ${fixedCheckbox('taxPercent', 'الضريبة')}
+        ${fixedCheckbox('workDescription', 'وصف الأعمال')}
+        ${fixedCheckbox('preparedBy', 'مقدم العرض')}
+        ${fixedCheckbox('location2', 'الموقع (تفاصيل)')}
+      </div>
+      <h5 style="color:var(--green);margin:10px 0 8px;">قيم الحقول الثابتة:</h5>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+        ${fixedValueField('location', 'الموقع')}
+        ${fixedValueField('taxNumberClient', 'الرقم الضريبي للعميل')}
+        ${fixedValueField('paymentMethod', 'طريقة الدفع')}
+        ${fixedValueField('project', 'المشروع')}
+        ${fixedValueField('materialType', 'نوع الخرسانة')}
+        ${fixedValueField('taxPercent', 'الضريبة (%)', 'number')}
+        ${fixedValueField('workDescription', 'وصف الأعمال')}
+        ${fixedValueField('preparedBy', 'مقدم العرض')}
+        ${fixedValueField('location2', 'الموقع (تفاصيل)')}
+      </div>
+    </div>
+    <div class="panel" style="grid-column:1/-1;"><h4>⚙️ إعدادات العرض</h4>
+      <div style="display:flex;align-items:center;gap:12px;padding:10px 0;">
+        <label style="font-weight:700;font-size:14px;">🔽 إظهار الإجمالي في المعاينة</label>
+        <input type="checkbox" id="s-showTotal" ${showTotal ? 'checked' : ''}>
+      </div>
+    </div>
+  </div>
+  <div class="actions-bar"><button class="btn-primary" id="save-settings">💾 حفظ جميع الإعدادات</button></div>`;
+  }
+
+  function bindSettings() {
+    document.getElementById('save-settings').addEventListener('click', async () => {
+      const fixedFields = {};
+      const fieldKeys = ['location', 'taxNumberClient', 'paymentMethod', 'project', 'materialType', 'taxPercent',
+        'workDescription', 'preparedBy', 'location2'
+      ];
+      fieldKeys.forEach(key => {
+        const checkbox = document.getElementById('ff-' + key);
+        fixedFields[key] = checkbox ? checkbox.checked : false;
+      });
+
+      const fixedValues = {};
+      fieldKeys.forEach(key => {
+        const input = document.getElementById('fv-' + key);
+        fixedValues[key] = input ? input.value : '';
+      });
+      fixedValues.taxPercent = Number(fixedValues.taxPercent) || 15;
+
+      const fixedNotes = document.getElementById('s-fixedNotes').value;
+      const showTotal = document.getElementById('s-showTotal').checked;
+
+      // جمع الملاحظات الثابتة لكل نوع
+      const typeFixedNotes = {};
+      Object.keys(TYPES).forEach(key => {
+        const t = TYPES[key];
+        if (t.kind === 'quote') {
+          const noteInput = document.getElementById('type-note-' + key);
+          typeFixedNotes[key] = noteInput ? noteInput.value : '';
+        }
+      });
+
+      const newSettings = {
+        ...SETTINGS,
+        companyLine1: document.getElementById('s-companyLine1').value,
+        companyLine2: document.getElementById('s-companyLine2').value,
+        slogan: document.getElementById('s-slogan').value,
+        taxNumber: document.getElementById('s-taxNumber').value,
+        address: document.getElementById('s-address').value,
+        phone: document.getElementById('s-phone').value,
+        email: document.getElementById('s-email').value,
+        website: document.getElementById('s-website').value,
+        whatsappNumber: document.getElementById('s-whatsapp').value,
+        bankName: document.getElementById('s-bankName').value,
+        bankNameEn: document.getElementById('s-bankNameEn').value,
+        accountNumber: document.getElementById('s-accountNumber').value,
+        iban: document.getElementById('s-iban').value,
+        year: document.getElementById('s-year').value,
+        nextNumber: Number(document.getElementById('s-nextNumber').value),
+        fixedNotes: fixedNotes,
+        fixedFields: fixedFields,
+        fixedValues: fixedValues,
+        showTotal: showTotal,
+        typeFixedNotes: typeFixedNotes
+      };
+      
+      await saveSettings(newSettings);
+      toast('✅ تم حفظ جميع الإعدادات');
+    });
+  }
+</script>
+</body>
+</html>
